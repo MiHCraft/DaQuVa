@@ -1,0 +1,83 @@
+\documentclass{tum_report}
+
+
+\bibliographystyle{tex_files/bibliography/styles/iso690} % downloaded from some chech uni
+
+% Make \paragraph a block heading (new line after it)
+\usepackage{titlesec}
+
+\titleformat{\paragraph}[block]
+  {\normalfont\normalsize\bfseries}
+  {\theparagraph}{1em}{}
+
+\titlespacing*{\paragraph}{0pt}{1.2ex}{0.6ex}
+
+ \usepackage{float}      
+\usepackage{placeins}
+\usepackage{forest}
+\usepackage{adjustbox}
+
+
+\forestset{
+  daqtree/.style={
+    for tree={
+      draw,
+      rounded corners,
+      align=center,
+      parent anchor=south,
+      child anchor=north,
+      edge={->},
+      l sep=10pt,
+      s sep=6pt,
+      font=\ttfamily\small
+    }
+  }
+}
+
+
+\newcommand{\bnf}[1]{\texttt{\langle #1 \rangle}}
+\begin{document}
+
+    \input{tex_files/title_page}
+    \clearpage
+
+    \input{tex_files/abstract} 
+    \clearpage
+
+    \addtocontents{toc}{\protect \thispagestyle{empty}}
+    \tableofcontents
+    \thispagestyle{empty}
+    \clearpage
+
+    \input{tex_files/introduction}
+    \clearpage
+
+    \input{tex_files/domain_analysis}
+    \clearpage
+
+    \input{tex_files/dsl_design}
+    \clearpage
+
+    \input{tex_files/dsl_implementation}
+    \clearpage
+
+    \input{tex_files/evaluation}
+    \clearpage
+
+    \input{tex_files/discussion}
+    \clearpage
+
+    \input{tex_files/conclusion}
+    \clearpage
+    
+    \phantomsection
+    \addcontentsline{toc}{chapter}{Bibliography}
+
+    % you can use either .bib format or .tex. Please, do not use both, comment the one you don't need.
+    \nocite{*} 
+    \bibliography{tex_files/bibliography/bibliography} % .bib
+
+
+    % \input{tex_files/bibliography/bibliography} % simply .tex
+
+\end{document}

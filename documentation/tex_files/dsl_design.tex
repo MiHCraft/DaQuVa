@@ -1,0 +1,975 @@
+\chapter{DaQuVa DSL: Language Design}
+
+\section{Introduction to DaQuVa DSL Design}
+DaQuVa (Data Quality Validator) is a domain-specific language designed to facilitate the safe and efficient cleaning, validation, and analysis of large datasets within SQL databases. The language adopts a declarative programming paradigm, emphasizing "what" to do rather than "how" to do it, which aligns with the needs of data engineers and analysts who require concise, readable scripts for data quality tasks.
+
+The DSL is tailored for post-validation data cleaning in enormous databases, where data has already undergone initial validation but may still contain inconsistencies, duplicates, or errors. DaQuVa ensures cautious operations by incorporating confidence-based scoring (e.g., dirty\_level, duplicate\_score) and explicit safety mechanisms (e.g., Here() with allowDanger) to prevent accidental data loss.
+
+Key design principles include:
+\begin{itemize}
+    \item \textbf{Declarative Nature}: Users describe data transformations and validations without specifying low-level implementation details.
+    \item \textbf{Safety-First}: Destructive operations require explicit thresholds and permissions.
+    \item \textbf{Reusability}: Support for variables and functions to enable modular, pipeline-friendly scripts.
+    \item \textbf{Extensibility}: Architecture allows integration of AI-based or rule-based tools for validation.
+\end{itemize}
+
+
+\section{Initial DSL Grammar}
+\label{sec:grammar}
+
+\subsection{Design Principles}
+
+The grammar of DaQuVa is guided by three principles:
+
+\begin{enumerate}[noitemsep]
+    \item \textbf{Readability.} Statements read like short English instructions
+          (\texttt{scan table."col" using tool "name"}).
+    \item \textbf{Minimalism.} Only constructs required for data-quality tasks
+          are included; general-purpose programming facilities are deliberately
+          omitted.
+    \item \textbf{Safety by default.} Destructive operations on the underlying
+          database require an explicit \texttt{allowDanger} flag, making
+          accidental data modification syntactically impossible.
+\end{enumerate}
+
+\subsection{Lexical Elements}
+\label{sec:lexical}
+
+The lexical layer defines the primitive tokens consumed by the parser.
+
+\subsubsection{Keywords}
+
+The reserved words of DaQuVa are grouped by functional category in
+Table~\ref{tab:keywords}. They may not be used as identifiers.
+
+\begin{table}[H]
+\centering
+\caption{Reserved keywords of DaQuVa, grouped by category.}
+\label{tab:keywords}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{|p{4cm}|p{9cm}|}
+\hline
+\normalfont\textbf{Category} & \textbf{Keywords} \\
+\hline
+Database
+  & \texttt{my\_db} \\
+\hline
+Function \& Control
+  & \texttt{function},\quad \texttt{return} \\
+\hline
+Commands
+  & \texttt{scan},\quad \texttt{filter},\quad \texttt{merge},\quad
+    \texttt{output},\quad \texttt{newTable},\quad
+    \texttt{findLocalDuplicates} \\
+\hline
+Conditions \& Logic
+  & \texttt{where},\quad \texttt{AND},\quad \texttt{OR},\quad
+    \texttt{columns} \\
+\hline
+Tool Integration
+  & \texttt{using},\quad \texttt{tool} \\
+\hline
+Output Targets
+  & \texttt{console},\quad \texttt{file},\quad \texttt{from},\quad
+    \texttt{addColumns} \\
+\hline
+Safety Flags
+  & \texttt{Here},\quad \texttt{allowDanger} \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsubsection{Identifiers}
+
+An identifier begins with a letter and may be followed by any combination of
+letters, digits, and underscores:
+
+\begin{lstlisting}[style=bnf]
+<identifier> ::= <letter> { <letter> | <digit> | "_" }
+<letter>     ::= "a" | ... | "z" | "A" | ... | "Z"
+<digit>      ::= "0" | ... | "9"
+\end{lstlisting}
+
+\subsubsection{Literals}
+
+DaQuVa supports two literal types:
+
+\begin{lstlisting}[style=bnf]
+<string> ::= '"' { <any_char_except_quote> } '"'
+<number> ::= <digit> { <digit> }
+\end{lstlisting}
+
+\texttt{<number>} denotes a non-negative integer, used for thresholds and
+confidence scores. String literals are delimited by double quotes and may
+contain any character except an unescaped double quote.
+
+\subsubsection{Comments}
+
+Single-line comments begin with \texttt{\#} and extend to the end of the line.
+Comments are ignored by the parser.
+
+\subsubsection{Whitespace and Layout}
+
+Unlike indentation-sensitive languages such as Python, DaQuVa treats
+whitespace purely as a lexical separator. The parser ignores formatting
+characters and does not assign semantic meaning to indentation.
+
+The following rules apply:
+
+\begin{itemize}[noitemsep]
+    \item One or more whitespace characters may appear between tokens
+          to separate them.
+    \item Consecutive spaces are treated as a single separator.
+    \item Tab characters and newline characters are ignored by the parser.
+    \item Program structure is defined by explicit punctuation rather than
+          indentation.
+    \item The semicolon (\texttt{;}) is the only required statement
+          terminator and separates commands.
+\end{itemize}
+
+As a result, developers may freely format DaQuVa programs for readability.
+The following examples are syntactically equivalent:
+
+\begin{lstlisting}[style=dsl]
+filter potential_dirty where dirty_level > 70;
+\end{lstlisting}
+
+\begin{lstlisting}[style=dsl]
+filter    potential_dirty
+    where   dirty_level    >    70   ;
+\end{lstlisting}
+
+This design follows the convention of languages such as C and SQL, where
+whitespace improves readability but does not influence program semantics.
+
+\subsubsection{Operators and Punctuation}
+
+Table~\ref{tab:entities} lists the core semantic entities of DaQuVa.
+
+\begin{table}[H]
+\centering
+\caption{Core semantic entities of DaQuVa.}
+\label{tab:entities}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{|p{4cm}|p{9cm}|}
+\hline
+\textbf{Entity} & \textbf{Description} \\
+\hline
+
+\texttt{my\_db} &
+Declares the active database connection using an opaque connection string. Exactly one \texttt{my\_db} declaration is expected per program; re-declaration overwrites the current context. \\
+\hline
+
+Table &
+The primary data container. Tables exist either in the connected database or as in-memory result sets produced by \texttt{scan} or \texttt{newTable}. \\
+\hline
+
+Variable &
+Any command result can be bound to a variable. Variables are untyped at the syntax level but carry a \emph{result-set} value at runtime. \\
+\hline
+
+Tool &
+An external validator or AI-powered analyser identified by a string name (e.g., \texttt{"fuzzy\_matcher"}, \texttt{"typo\_checker"}). The runtime resolves the name to a registered tool implementation. \\
+\hline
+
+Column / Meta-variable &
+Columns such as \texttt{dirty\_level} and \texttt{duplicate\_score} are injected into result sets automatically by \texttt{scan} and \texttt{findLocalDuplicates}, respectively. They may also be added explicitly via \texttt{addColumns}. \\
+\hline
+
+Function &
+A named, reusable sequence of commands parameterised by identifiers. Calling a function executes its body in a new scope; parameters shadow outer variables. \\
+\hline
+
+Threshold / Confidence &
+An integer in the range $[0,100]$ representing a minimum quality score. Used in \texttt{filter} conditions and as the confidence argument to \texttt{Here()}. \\
+\hline
+
+\texttt{Here()} &
+A special sink that redirects writes into the live database. Requires an optional confidence argument; when used with \texttt{merge}, it writes merged records back to the source. \\
+\hline
+
+\texttt{allowDanger} &
+A boolean flag that must be present on any \texttt{merge} command that targets \texttt{Here()}. It serves as an explicit acknowledgement that the operation modifies persisted data. \\
+\hline
+
+\end{tabular}
+\end{table}
+
+\subsection{Syntactic Grammar in BNF}
+\label{sec:bnf}
+
+The complete context-free grammar of DaQuVa is given below.
+Non-terminals are enclosed in angle brackets; terminals are quoted.
+Curly braces denote zero-or-more repetition; square brackets denote an optional
+element.
+
+\begin{lstlisting}[style=bnf, caption={Complete BNF grammar of DaQuVa.}, label={lst:bnf}]
+<program> ::= <statement> <program>
+            | <empty>
+
+<empty> ::=
+
+
+<statement> ::= <db_init>
+              | <variable_assign>
+              | <function_def>
+              | <command_statement>
+
+
+<db_init> ::= "my_db" <string> ";"
+
+
+<variable_assign> ::= <identifier> "=" <command_statement> ";"
+
+
+<function_def> ::= "function" <identifier>
+                   "(" <opt_param_list> ")" ":"
+                   <statement_block>
+
+
+<opt_param_list> ::= <param_list>
+                   | <empty>
+
+
+<param_list> ::= <identifier> <param_list_tail>
+
+<param_list_tail> ::= "," <identifier> <param_list_tail>
+                    | <empty>
+
+
+<statement_block> ::= <statement> <statement_block>
+                    | <empty>
+
+
+<command_statement> ::= <scan_command>
+                      | <filter_command>
+                      | <find_duplicates_command>
+                      | <merge_command>
+                      | <output_command>
+                      | <new_table_command>
+                      | <function_call>
+
+
+<scan_command> ::= "scan" <table_column> "using" "tool" <tool_name>
+
+
+<tool_name> ::= <string>
+
+
+<table_column> ::= <table_name> "." <column_name>
+
+<table_name> ::= <string>
+
+<column_name> ::= <string>
+
+
+<filter_command> ::= "filter" <identifier> "where" <condition>
+
+
+<condition> ::= <expression> <condition_tail>
+
+
+<condition_tail> ::= <logical_op> <expression> <condition_tail>
+                   | <empty>
+
+
+<logical_op> ::= "AND"
+               | "OR"
+
+
+<expression> ::= <identifier> <comparison_op> <number>
+
+
+<comparison_op> ::= ">"
+                  | "<"
+                  | ">="
+                  | "<="
+                  | "=="
+                  | "!="
+
+
+<find_duplicates_command> ::= "findLocalDuplicates" <identifier>
+                              "columns" "[" <column_list> "]"
+                              <opt_using_tool>
+
+
+<opt_using_tool> ::= "using" "tool" <string>
+                   | <empty>
+
+
+<column_list> ::= <string> <column_list_tail>
+
+<column_list_tail> ::= "," <string> <column_list_tail>
+                     | <empty>
+
+
+<merge_command> ::= "merge" <identifier>
+                    "->" "Here" <opt_merge_offset> <opt_allow_danger>
+
+
+<opt_merge_offset> ::= "(" <number> ")"
+                     | <empty>
+
+
+<opt_allow_danger> ::= "allowDanger"
+                     | <empty>
+
+
+<output_command> ::= "output" <identifier> "->" <output_target>
+
+
+<output_target> ::= "console"
+                  | "file" <string>
+                  | "Here" <opt_output_offset>
+
+
+<opt_output_offset> ::= "(" <number> ")"
+                      | <empty>
+
+
+<new_table_command> ::= "newTable" <string>
+                        <opt_from>
+                        <opt_add_columns>
+
+
+<opt_from> ::= "from" <identifier>
+             | <empty>
+
+
+<opt_add_columns> ::= "addColumns" "[" <column_func_list> "]"
+                    | <empty>
+
+
+<column_func_list> ::= <column_func> <column_func_list_tail>
+
+<column_func_list_tail> ::= "," <column_func> <column_func_list_tail>
+                          | <empty>
+
+
+<column_func> ::= <string>
+                | <func_call>
+
+
+<func_call> ::= <identifier> "(" <opt_arg_list> ")"
+
+
+<function_call> ::= <identifier> "(" <opt_arg_list> ")"
+
+
+<opt_arg_list> ::= <arg_list>
+                 | <empty>
+
+
+<arg_list> ::= <value> <arg_list_tail>
+
+<arg_list_tail> ::= "," <value> <arg_list_tail>
+                  | <empty>
+
+
+<value> ::= <identifier>
+          | <string>
+          | <number>
+
+
+<identifier> ::= <letter> <identifier_tail>
+
+<identifier_tail> ::= <letter> <identifier_tail>
+                    | <digit> <identifier_tail>
+                    | "_" <identifier_tail>
+                    | <empty>
+
+
+<number> ::= <digit> <number_tail>
+
+<number_tail> ::= <digit> <number_tail>
+                | <empty>
+
+
+<string> ::= '"' <string_body> '"'
+
+<string_body> ::= <any_char_except_quote> <string_body>
+                | <empty>\end{lstlisting}
+
+\subsection{Core Syntactic Structures}
+
+\subsubsection{Program and Statements}
+
+A DaQuVa program is a flat sequence of statements with no required entry-point.
+Execution proceeds top-to-bottom. There are four statement kinds:
+
+\begin{itemize}[noitemsep]
+    \item \textbf{Database initialisation} (\texttt{my\_db}): establishes the
+          active connection.
+    \item \textbf{Variable assignment}: binds the result of a command to a name.
+    \item \textbf{Function definition}: introduces a named, reusable routine.
+    \item \textbf{Command statement}: executes an action without binding.
+\end{itemize}
+
+\subsubsection{Expressions and Conditions}
+
+Conditions used in \texttt{filter} commands consist of one or more
+\emph{expressions} joined by \texttt{AND} / \texttt{OR}. Each expression
+compares a column-level attribute (e.g.\ \texttt{dirty\_level}) to an integer
+threshold using a standard comparison operator. This deliberately limited
+expression language prevents arbitrary logic and keeps programs auditable.
+
+\subsubsection{Functions}
+
+Functions accept a comma-separated list of positional parameters and contain
+an indentation-delimited block of statements. Unlike general-purpose languages,
+DaQuVa functions may only contain the same statement types available at the
+top level; there is no nested function definition or recursion.
+
+% ============================================================
+\section{Basic DSL Semantics}
+\label{sec:semantics}
+% ============================================================
+
+\subsection{Execution Model}
+
+DaQuVa programs execute \emph{sequentially}. Each statement is fully evaluated
+before the next begins. The runtime maintains:
+
+\begin{enumerate}[noitemsep]
+    \item A single \textbf{database context} set by \texttt{my\_db}.
+    \item A \textbf{variable environment} mapping names to result sets.
+    \item A \textbf{function table} mapping names to parameter lists and
+          statement blocks.
+\end{enumerate}
+
+There is no implicit concurrency, no exception-handling syntax, and no
+dynamic typing --- every variable holds a \emph{result set} (a typed, annotated
+table-like structure).
+
+\subsection{Semantic Description of Core Constructs}
+
+Table~\ref{tab:entities} summarises the principal semantic entities of DaQuVa.
+
+\begin{table}[H]
+    \centering
+
+\caption{Core semantic entities of DaQuVa}
+\label{tab:entities}\\
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Entity} & \textbf{Description} \\
+\hline
+
+
+\texttt{my\_db} &
+Declares the active database connection using an opaque connection string.
+Exactly one \texttt{my\_db} declaration is expected per program; re-declaration overwrites the current context. \\
+\hline
+
+Table &
+The primary data container. Tables exist either in the connected database or as in-memory result sets produced by \texttt{scan} or \texttt{newTable}. \\
+\hline
+
+Variable &
+Any command result can be bound to a variable. Variables are untyped at the syntax level but carry a \emph{result-set} value at runtime. \\
+\hline
+
+Tool &
+An external validator or AI-powered analyser identified by a string name (e.g. \texttt{"fuzzy\_matcher"}, \texttt{"typo\_checker"}). The runtime resolves the name to a registered tool implementation. \\
+\hline
+
+Column / Meta-variable &
+Columns such as \texttt{dirty\_level} and \texttt{duplicate\_score} are injected into result sets automatically by \texttt{scan} and \texttt{findLocalDuplicates}, respectively. They may also be added explicitly via \texttt{addColumns}. \\
+\hline
+
+Function &
+A named, reusable sequence of commands parameterised by identifiers. Calling a function executes its body in a new scope; parameters shadow outer variables. \\
+\hline
+
+Threshold / Confidence &
+An integer in the range $[0,100]$ representing a minimum quality score. Used in \texttt{filter} conditions and as the confidence argument to \texttt{Here()}. \\
+\hline
+
+\texttt{Here()} &
+A special sink that redirects writes into the live database. Requires an optional confidence argument; when used with \texttt{merge}, it writes merged records back to the source. \\
+\hline
+
+\texttt{allowDanger} &
+A boolean flag that must be present on any \texttt{merge} command that targets \texttt{Here()}. It serves as an explicit acknowledgement that the operation modifies persisted data. \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Command Semantics}
+
+\subsubsection{\texttt{scan} --- Column Validation}
+
+\begin{lstlisting}[style=bnf]
+<scan_command> ::= "scan" <table_column> "using" "tool" <string>
+\end{lstlisting}
+
+\textbf{Meaning.} \texttt{scan} passes every value in the named column of the
+named table to the specified tool. The tool assigns each row a
+\texttt{dirty\_level} score in $[0, 100]$, where 100 represents maximum
+dirtiness. The result is an annotated copy of the rows with the added
+meta-column.
+
+\textbf{Execution.}
+\begin{enumerate}[noitemsep]
+    \item Resolve the table name against the active database context.
+    \item Resolve the tool name against the registered tool registry.
+    \item Invoke the tool for each row value in the column.
+    \item Return a result set containing all original columns plus
+          \texttt{dirty\_level}.
+\end{enumerate}
+
+\textbf{Errors.} An error is raised if the table or column does not exist,
+if the tool name cannot be resolved, or if the database context has not been
+initialised.
+
+\subsubsection{\texttt{filter} --- Threshold Filtering}
+
+\begin{lstlisting}[style=bnf]
+<filter_command> ::= "filter" <identifier> "where" <condition>
+\end{lstlisting}
+
+\textbf{Meaning.} Produces a subset of the input result set containing only
+rows that satisfy the given condition.
+
+\textbf{Execution.} Each row is evaluated against the condition; rows for which
+the condition is true are retained. Conditions may combine multiple predicates
+with \texttt{AND} / \texttt{OR}; evaluation follows standard boolean semantics
+with left-to-right associativity.
+
+\textbf{Errors.} An error is raised if the referenced variable is undefined,
+if a column referenced in a condition does not exist in the result set, or if
+operand types are incompatible.
+
+\subsubsection{\texttt{findLocalDuplicates} --- Duplicate Detection}
+
+\begin{lstlisting}[style=bnf]
+<find_duplicates_command>
+    ::= "findLocalDuplicates" <identifier>
+            "columns" "[" <column_list> "]"
+            [ "using" "tool" <string> ]
+\end{lstlisting}
+
+\textbf{Meaning.} Identifies rows within the input result set that are
+potential duplicates according to the specified key columns. An optional
+AI-powered tool (e.g.\ a fuzzy matcher) provides similarity scoring.
+
+\textbf{Execution.} Rows are grouped by the specified columns; within each
+group, pairs are scored for similarity. The result set contains all candidate
+duplicate rows annotated with a \texttt{duplicate\_score} in $[0, 100]$.
+
+\textbf{Errors.} An error is raised if the input variable is undefined or if
+any listed column does not exist in the result set.
+
+\subsubsection{\texttt{merge} --- Duplicate Resolution}
+
+\begin{lstlisting}[style=bnf]
+<merge_command> ::= "merge" <identifier>
+                        "->" "Here" [ "(" <number> ")" ]
+                        [ "allowDanger" ]
+\end{lstlisting}
+
+\textbf{Meaning.} Merges duplicate records in the input result set and
+writes the resolved records back to the live database through \texttt{Here()}.
+The optional numeric argument specifies a minimum confidence threshold;
+only duplicate pairs with \texttt{duplicate\_score} $\geq$ threshold are
+merged.
+
+\textbf{Execution.}
+\begin{enumerate}[noitemsep]
+    \item Filter candidates by the confidence threshold (default: 0).
+    \item For each qualifying pair, apply a deterministic merge strategy
+          (e.g.\ keep the most complete record).
+    \item Write merged records to the database; delete superseded records.
+\end{enumerate}
+
+\textbf{Safety constraint.} The \texttt{allowDanger} flag \emph{must} be
+present. Its absence is a compile-time error. This design makes destructive
+database modifications opt-in and visible in code review.
+
+\subsubsection{\texttt{output} --- Result Export}
+
+\begin{lstlisting}[style=bnf]
+<output_command> ::= "output" <identifier> "->" <output_target>
+<output_target>  ::= "console" | "file" <string> | "Here" [ "(" <number> ")" ]
+\end{lstlisting}
+
+\textbf{Meaning.} Writes a result set to one of three sinks: the console
+(standard output), a named file, or the live database via \texttt{Here()}.
+
+\textbf{Execution.}
+\begin{itemize}[noitemsep]
+    \item \texttt{console} --- serialises rows as human-readable text.
+    \item \texttt{file "<path>"} --- writes rows to the specified file path in
+          a delimited format (e.g.\ CSV).
+    \item \texttt{Here()} --- inserts or upserts rows into the database.
+\end{itemize}
+
+\textbf{Errors.} An error is raised if the variable is undefined, if the
+file path is not writable, or if the database context is missing for
+\texttt{Here()}.
+
+\subsubsection{\texttt{newTable} --- Table Construction}
+
+\begin{lstlisting}[style=bnf]
+<new_table_command> ::= "newTable" <string>
+                            [ "from" <identifier> ]
+                            [ "addColumns" "[" <column_func_list> "]" ]
+\end{lstlisting}
+
+\textbf{Meaning.} Creates a new named table, optionally seeded from an
+existing result set and optionally extended with computed columns.
+
+\textbf{Execution.} If \texttt{from} is provided, the new table is initialised
+with the rows of the referenced result set. Each entry in \texttt{addColumns}
+is either a plain column name (copied from the source) or a function call
+whose result becomes a new column value (e.g.\ \texttt{length("name")}).
+
+\subsubsection{\texttt{function} and Function Calls}
+
+\begin{lstlisting}[style=bnf]
+<function_def>  ::= "function" <identifier> "(" [ <param_list> ] ")" ":"
+                        <statement_block>
+<function_call> ::= <identifier> "(" [ <arg_list> ] ")"
+\end{lstlisting}
+
+\textbf{Meaning.} Functions encapsulate reusable command sequences. They are
+\emph{first-defined} (must be defined before use in a top-to-bottom
+interpreter) and execute in their own variable scope. Parameters are
+positional; the number of arguments at the call site must match the parameter
+list.
+
+\textbf{Errors.} Arity mismatch, calling an undefined function, or a
+\texttt{return} statement referencing an undefined variable all raise errors.
+
+\subsection{Error Catalogue}
+
+Table~\ref{tab:errors} catalogues the principal errors and their triggers.
+
+\begin{table}[H]
+\centering
+\caption{Error catalogue for DaQuVa.}
+\label{tab:errors}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{|p{4cm}|p{10cm}|}
+\hline
+\normalfont\textbf{Error} & \textbf{Condition} \\
+\hline
+UndefinedVariable & An identifier is used before assignment. \\
+\hline
+UndefinedTable    & A table name cannot be resolved in the database context. \\
+\hline
+UndefinedColumn   & A column referenced in a condition or column list does
+                    not exist in the result set. \\
+\hline
+UnresolvedTool    & A tool string cannot be matched to a registered tool. \\
+\hline
+ArityMismatch     & A function call provides more or fewer arguments than
+                    parameters declared. \\
+\hline
+MissingContext    & A database-dependent command is issued before
+                    \texttt{my\_db}. \\
+\hline
+MissingAllowDanger & A \texttt{merge -> Here()} command lacks the
+                    \texttt{allowDanger} flag. \\
+\hline
+InvalidThreshold  & A numeric argument to \texttt{Here()} or a filter
+                    expression falls outside $[0, 100]$. \\
+\hline
+IOError           & The file path in an \texttt{output -> file} command
+                    is not accessible. \\
+\hline
+\end{tabular}
+\end{table}
+
+% ============================================================
+\section{Illustrative Example Program}
+\label{sec:example}
+% ============================================================
+
+The program below demonstrates all major language constructs. It connects to a
+database, defines a reusable email-cleaning function, applies it, exports
+results, detects and merges duplicates, and creates a summary table for further
+analysis.
+
+\begin{lstlisting}[style=dsl, caption={Annotated DaQuVa example program.}, label={lst:example}]
+# === 1. Database connection ===
+my_db "some_connection_string_goes_here";
+
+# === 2. Reusable function: clean emails in any table ===
+function cleanEmails(table_name, threshold):
+    # Scan the email column with an AI validator
+    potential_dirty = scan table_name."email" using tool "misa_ai_validator";
+
+    # Keep only rows whose dirty_level exceeds the threshold
+    high_risk = filter potential_dirty where dirty_level > threshold;
+
+    return high_risk;
+
+# === 3. Apply the function to the "users" table ===
+high_risk_emails = cleanEmails("users", 70);
+
+# === 4. Export results ===
+output high_risk_emails -> file "high_risk_emails.csv";
+output high_risk_emails -> console;
+
+# === 5. Detect near-duplicate records among high-risk rows ===
+duplicates = findLocalDuplicates high_risk_emails
+             columns ["name", "dob"]
+             using tool "fuzzy_matcher";
+
+# === 6. Merge duplicates back into the database (confidence >= 90%) ===
+merge duplicates -> Here(90) allowDanger;
+
+# === 7. Create a summary table for downstream analysis ===
+analysis_table = newTable "high_risk_analysis"
+                 from high_risk_emails
+                 addColumns [duplicate_score, length("name")];
+
+# === 8. Additional validation pass on the summary table ===
+cli_result = scan analysis_table."email" using tool "typo_checker";
+output cli_result -> console;
+\end{lstlisting}
+
+The program illustrates several semantic properties:
+
+\begin{itemize}
+    \item The function \texttt{cleanEmails} abstracts a two-step
+          scan-then-filter pipeline, making the threshold a tuneable parameter.
+    \item The \texttt{output} command is used twice on the same variable,
+          demonstrating that result sets are non-destructively consumed.
+    \item The \texttt{merge} command requires \texttt{allowDanger}
+          because it writes to the live database, making the risky operation
+          immediately visible to reviewers.
+    \item \texttt{newTable} constructs a derived table that mixes copied data
+          with computed columns (\texttt{duplicate\_score}, \texttt{length("name")}),
+          enabling further analysis without modifying the source table.
+\end{itemize}
+
+% ============================================================
+\section{Derivation Trees for Control Structures}
+% ============================================================
+
+Below are the derivation trees for the main control structures of DaQuVa.
+
+% ----------------------------------------------------------
+\subsection{Variable Definition}
+% ----------------------------------------------------------
+
+\textbf{Example:} \texttt{high\_risk\_emails = cleanEmails("users", 70);}
+
+\begin{center}
+\begin{adjustbox}{max width=\textwidth}
+\begin{forest} daqtree
+[statement
+  [variable\_assign
+    [identifier [high\_risk\_emails]]
+    [=]
+    [function\_call
+      [cleanEmails]
+      [arg\_list
+        ["users"]
+        [,]
+        [70]
+      ]
+    ]
+    [;]
+  ]
+]
+\end{forest}
+\end{adjustbox}
+\end{center}
+
+% ----------------------------------------------------------
+\subsection{scan Command}
+% ----------------------------------------------------------
+
+\textbf{Example:} \texttt{scan table\_name."email" using tool "misa\_ai\_validator";}
+
+\begin{center}
+\begin{adjustbox}{max width=\textwidth}
+\begin{forest} daqtree
+[statement
+  [scan\_command
+    [scan]
+    [table\_column
+      [table\_name]
+      [.]
+      ["email"]
+    ]
+    [using]
+    [tool]
+    ["misa\_ai\_validator"]
+    [;]
+  ]
+]
+\end{forest}
+\end{adjustbox}
+\end{center}
+
+% ----------------------------------------------------------
+\subsection{filter Command}
+% ----------------------------------------------------------
+
+\textbf{Example:} \texttt{filter potential\_dirty where dirty\_level > 70;}
+
+\begin{center}
+\begin{adjustbox}{max width=\textwidth}
+\begin{forest} daqtree
+[statement
+  [filter\_command
+    [filter]
+    [potential\_dirty]
+    [where]
+    [condition
+      [dirty\_level]
+      [>]
+      [70]
+    ]
+    [;]
+  ]
+]
+\end{forest}
+\end{adjustbox}
+\end{center}
+
+% ----------------------------------------------------------
+\subsection{Function Definition}
+% ----------------------------------------------------------
+
+\textbf{Example:} \texttt{function cleanEmails(table\_name, threshold):}
+
+\begin{center}
+\begin{adjustbox}{max width=\textwidth}
+\begin{forest} daqtree
+[function\_def
+  [function]
+  [cleanEmails]
+  [param\_list
+    [table\_name]
+    [,]
+    [threshold]
+  ]
+  [:]
+  [statement\_block]
+]
+\end{forest}
+\end{adjustbox}
+\end{center}
+
+% ----------------------------------------------------------
+\subsection{merge Command}
+% ----------------------------------------------------------
+
+\textbf{Example:} \texttt{merge duplicates -> Here(90) allowDanger;}
+
+\begin{center}
+\begin{adjustbox}{max width=\textwidth}
+\begin{forest} daqtree
+[statement
+  [merge\_command
+    [merge]
+    [duplicates]
+    [->]
+    [Here]
+    [(90)]
+    [allowDanger]
+    [;]
+  ]
+]
+\end{forest}
+\end{adjustbox}
+\end{center}
+
+% ----------------------------------------------------------
+\subsection{output Command}
+% ----------------------------------------------------------
+
+\textbf{Example:} \texttt{output high\_risk\_emails -> file "high\_risk\_emails.csv";}
+
+\begin{center}
+\begin{adjustbox}{max width=\textwidth}
+\begin{forest} daqtree
+[statement
+  [output\_command
+    [output]
+    [high\_risk\_emails]
+    [->]
+    [file]
+    ["high\_risk\_emails.csv"]
+    [;]
+  ]
+]
+\end{forest}
+\end{adjustbox}
+\end{center}
+
+% ----------------------------------------------------------
+\subsection{findLocalDuplicates Command}
+% ----------------------------------------------------------
+
+\textbf{Example:} \texttt{findLocalDuplicates high\_risk\_emails columns ["name","dob"];}
+
+\begin{center}
+\begin{adjustbox}{max width=\textwidth}
+\begin{forest} daqtree
+[statement
+  [find\_duplicates\_command
+    [findLocalDuplicates]
+    [high\_risk\_emails]
+    [columns]
+    [column\_list
+      ["name"]
+      [,]
+      ["dob"]
+    ]
+    [;]
+  ]
+]
+\end{forest}
+\end{adjustbox}
+\end{center}
+
+% ----------------------------------------------------------
+\subsection{newTable Command}
+% ----------------------------------------------------------
+
+\textbf{Example:} \texttt{newTable "high\_risk\_analysis" from high\_risk\_emails addColumns [duplicate\_score];}
+
+\begin{center}
+\begin{adjustbox}{max width=\textwidth}
+\begin{forest} daqtree
+[statement
+  [new\_table\_command
+    [newTable]
+    ["high\_risk\_analysis"]
+    [from]
+    [high\_risk\_emails]
+    [addColumns]
+    [duplicate\_score]
+    [;]
+  ]
+]
+\end{forest}
+\end{adjustbox}
+\end{center}
+
+
+% ============================================================
+\section{Summary}
+% ============================================================
+
+This report has presented the complete formal grammar and semantic
+specification of the \textbf{Data Quality Validator} DSL. The BNF grammar
+in Section~\ref{sec:grammar} defines an unambiguous, minimal syntax
+covering database initialisation, column scanning, result filtering,
+duplicate detection and merging, result export, and table construction.
+The semantic specification in Section~\ref{sec:semantics} assigns a precise
+meaning to each construct, documents execution rules, and enumerates the
+error conditions the runtime must detect and report.
+
+The language's design deliberately constrains expressiveness in favour of
+safety and auditability: destructive operations require explicit opt-in flags,
+and the expression language is limited to simple threshold comparisons,
+preventing opaque side effects. These properties make DaQuVa programs
+straightforward to review, test, and extend.
