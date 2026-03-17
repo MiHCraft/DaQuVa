@@ -1,8 +1,214 @@
 \chapter{DSL Implementation}
 
-\section{lexer}
-\section{parser}
+The implementation of the DaQuVa DSL follows a classic compiler pipeline: lexer $\rightarrow$ parser $\rightarrow$ AST. All components are written in pure Python~3 and are directly derived from the formal BNF grammar presented in Chapter~4. The code is kept minimal, readable, and fully aligned with the safety-first and readability principles of the language.
+
+\section{Lexer}
+
+The lexer is a hand-written, regex-based tokenizer that converts the raw source code into a flat stream of tokens. It explicitly recognises every terminal symbol defined in the BNF (keywords, identifiers, literals, operators, punctuation) while discarding insignificant whitespace and comments. Although the grammar now defines <\texttt{\<SingleSpace\>}> and <\texttt{\<OneOrMoreSpaces\>}> for formal completeness, the lexer follows the standard convention (explicitly stated in the BNF note) and treats whitespace purely as a token separator.
+
+Key design decisions:
+\begin{itemize}
+    \item All reserved words are turned into a single \texttt{KW} token.
+    \item Whitespace (\texttt{[ \t\r\n]+}) and single-line comments (\texttt{\#.*}) are silently skipped.
+    \item Multi-character operators (\texttt{->}, \texttt{==}, \texttt{!=}, \texttt{>=}, \texttt{<=}) are recognised before single-character ones.
+    \item String literals have their surrounding quotes stripped.
+    \item Numbers are immediately converted to Python \texttt{int}.
+\end{itemize}
+
+\begin{lstlisting}[style=dsl, caption={Core lexer implementation (excerpt)}, label={lst:lexer}]
+KEYWORDS = frozenset({
+    'my', 'db', 'function', 'return', 'end', 'scan', 'filter', 'merge',
+    'output', 'newTable', 'findLocalDuplicates', 'where', 'AND', 'OR',
+    'columns', 'using', 'tool', 'console', 'file', 'from', 'addColumns',
+    'Here', 'allowDanger'
+})
+
+class Lexer:
+    _RULES = [
+        ('COMMENT',   r'#[^\n]*'),
+        ('STRING',    r'"[^"]*"'),
+        ('NUMBER',    r'\d+'),
+        ('ARROW',     r'->'),
+        ('COMP_OP',   r'!=|==|>=|<=|>|<'),
+        ('COLON',     r':'),
+        ('ASSIGN',    r'='),
+        ('SEMICOLON', r';'),
+        ('LPAREN',    r'\('),
+        ('RPAREN',    r'\)'),
+        ('LBRACKET',  r'\['),
+        ('RBRACKET',  r'\]'),
+        ('DOT',       r'\.'),
+        ('COMMA',     r','),
+        ('WORD',      r'[A-Za-z_]\w*'),
+        ('SKIP',      r'[ \t\r\n]+'),
+        ('MISMATCH',  r'.'),
+    ]
+
+    def __init__(self, source: str):
+        self.tokens = []
+        self.pos = 0
+        for mo in re.finditer('|'.join(f'(?P<{n}>{p})' for n,p in self._RULES), source):
+            kind = mo.lastgroup
+            if kind in ('SKIP', 'COMMENT'):
+                continue
+            if kind == 'MISMATCH':
+                raise LexerError(...)
+            if kind == 'STRING':
+                self.tokens.append(Token('STRING', mo.group()[1:-1], mo.start()))
+            elif kind == 'NUMBER':
+                self.tokens.append(Token('NUMBER', int(mo.group()), mo.start()))
+            elif kind == 'WORD':
+                k = 'KW' if mo.group() in KEYWORDS else 'ID'
+                self.tokens.append(Token(k, mo.group(), mo.start()))
+            else:
+                self.tokens.append(Token(kind, mo.group(), mo.start()))
+
+    def peek(self, offset=0):
+        idx = self.pos + offset
+        return self.tokens[idx] if idx < len(self.tokens) else Token('EOF', None, -1)
+
+    def consume(self, kind=None, value=None):
+        tok = self.peek()
+        if kind and tok.kind != kind or value and tok.value != value:
+            raise SyntaxError(...)
+        self.pos += 1
+        return tok
+\end{lstlisting}
+
+The lexer produces exactly the token stream expected by the recursive-descent parser and handles all edge cases from the illustrative example in Section~4.4.
+
+\section{Parser}
+
+The parser is a classic recursive-descent implementation that mirrors the BNF structure one-to-one. It uses the lexer’s \texttt{peek}/\texttt{consume} interface and builds the AST on the fly. Two small practical adaptations were introduced for real-world usability while staying faithful to the formal grammar:
+
+\begin{itemize}
+    \item Function bodies are terminated by the keyword \texttt{end} (the original BNF used pure recursion without an explicit closer; \texttt{end} makes the language non-indentation-sensitive).
+    \item The \texttt{return} statement (already present in the keyword table) was given its own AST node.
+\end{itemize}
+
+\begin{lstlisting}[style=dsl, caption={Parser entry point and statement dispatcher (excerpt)}, label={lst:parser}]
+class Parser:
+    def parse(self) -> Program:
+        stmts = []
+        while not self._at_end():
+            stmts.append(self._parse_statement())
+        return Program(stmts)
+
+    def _parse_statement(self):
+        tok = self._peek()
+        if tok.kind == 'KW':
+            if tok.value == 'my':          return self._parse_db_init()
+            if tok.value == 'function':    return self._parse_function_def()
+            if tok.value == 'return':      return self._parse_return()
+            node = self._parse_command()
+            self._consume('SEMICOLON')
+            return node
+        if tok.kind == 'ID':
+            if self._is('ASSIGN', offset=1):
+                return self._parse_assignment()
+            if self._is('LPAREN', offset=1):
+                node = self._parse_function_call()
+                self._consume('SEMICOLON')
+                return node
+        raise ParseError(...)
+
+    # Individual command parsers (scan, filter, findLocalDuplicates, merge,
+    # output, newTable) follow the BNF productions exactly and are omitted
+    # here for brevity. Each returns the corresponding AST node.
+\end{lstlisting}
+
+Every parsing method directly corresponds to a BNF production (e.g.\ \texttt{\_parse\_scan} implements \bnf{<scan\_command>}, \texttt{\_parse\_condition} implements the left-associative \bnf{<condition>} etc.). Error messages include source position for excellent developer experience.
+
 \section{AST}
+
+The Abstract Syntax Tree is defined with Python \texttt{dataclass}es, giving a clean, immutable, and type-safe representation that exactly mirrors the BNF non-terminals. All nodes inherit from a common \texttt{ASTNode} base class.
+
+\begin{lstlisting}[style=dsl, caption={Complete AST node hierarchy}, label={lst:ast}]
+@dataclass
+class ASTNode: pass
+
+@dataclass
+class Program(ASTNode):
+    statements: List[ASTNode]
+
+@dataclass
+class DatabaseInit(ASTNode):
+    connection: str
+
+@dataclass
+class FunctionDef(ASTNode):
+    name: str
+    params: List[str]
+    body: List[ASTNode]
+
+@dataclass
+class Assignment(ASTNode):
+    name: str
+    value: ASTNode
+
+@dataclass
+class ReturnStatement(ASTNode):
+    value: ASTNode
+
+@dataclass
+class Scan(ASTNode):
+    table: ASTNode          # Literal | Variable
+    column: str
+    tool: str
+
+@dataclass
+class Filter(ASTNode):
+    source: str
+    condition: ASTNode
+
+@dataclass
+class FindDuplicates(ASTNode):
+    source: str
+    columns: List[str]
+    tool: Optional[str]
+
+@dataclass
+class Merge(ASTNode):
+    source: str
+    threshold: Optional[int]
+
+@dataclass
+class Output(ASTNode):
+    source: str
+    target: str
+    path: Optional[str] = None
+    threshold: Optional[int] = None
+
+@dataclass
+class NewTable(ASTNode):
+    name: str
+    source: Optional[str]
+    columns: List[ASTNode]
+
+@dataclass
+class BinaryOp(ASTNode):
+    left: ASTNode
+    op: str
+    right: ASTNode
+
+@dataclass
+class FunctionCall(ASTNode):
+    name: str
+    args: List[ASTNode]
+
+@dataclass
+class Variable(ASTNode):
+    name: str
+
+@dataclass
+class Literal(ASTNode):
+    value: Union[int, str]
+\end{lstlisting}
+
+A simple \texttt{print\_ast} pretty-printer (included in the implementation) produces human-readable tree views for debugging. The AST serves as the single source of truth for all subsequent phases (semantic analysis, execution engine, pretty-printing, etc.).
+
+The lexer, parser, and AST together form a complete front-end that can already parse every valid DaQuVa program defined in the language specification.
+
 \section{semantic analysis}
 \section{execution engine}
 

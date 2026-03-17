@@ -1,0 +1,81 @@
+\begin{thebibliography}{10}
+\providecommand{\biburl}[1]{\url{#1}}
+\providecommand{\urlprefix}{Available from: }
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi:\discretionary{}{}{}#1}\else
+  \providecommand{\doi}{doi:\discretionary{}{}{}\begingroup
+  \urlstyle{rm}\Url}\fi
+\providecommand{\eprint}[2][]{\biburl{#2}}
+
+\bibitem{rahm2000data}
+Rahm, E.; Do, H.~H. Data Cleaning: Problems and Current Approaches. \emph{IEEE
+  Bulletin of the Technical Committee on Data Engineering}, volume~23, no.~4,
+  2000: pp. 3--13.
+\urlprefix\biburl{https://dbs.uni-leipzig.de/files/research/publications/2000-1/pdf/TBDE2000.pdf}
+
+\bibitem{chu2016datacleaning}
+Chu, X.; Ilyas, I.~F.; et al. Data Cleaning: Overview and Emerging Challenges.
+  In \emph{Proceedings of the 2016 International Conference on Management of
+  Data (SIGMOD)}, ACM, 2016, pp. 2201--2204, \doi{10.1145/2882903.2912574}.
+\urlprefix\biburl{https://dbgroup.cs.tsinghua.edu.cn/jnwang/papers/sigmod2016-datacleaning-tutorial.pdf}
+
+\bibitem{raman2001potterswheel}
+Raman, V.; Hellerstein, J.~M. Potter's Wheel: An Interactive Data Cleaning
+  System. In \emph{Proceedings of the 27th International Conference on Very
+  Large Data Bases (VLDB)}, VLDB Endowment, 2001, pp. 381--390.
+\urlprefix\biburl{https://control.cs.berkeley.edu/pwheel-vldb.pdf}
+
+\bibitem{kandel2011wrangler}
+Kandel, S.; Paepcke, A.; et al. Wrangler: Interactive Visual Specification of
+  Data Transformation Scripts. In \emph{Proceedings of the SIGCHI Conference on
+  Human Factors in Computing Systems (CHI)}, ACM, 2011, pp. 3363--3372,
+  \doi{10.1145/1978942.1979444}.
+\urlprefix\biburl{https://idl.cs.washington.edu/files/2011-Wrangler-CHI.pdf}
+
+\bibitem{quality-assessment-uml}
+Langer, P.; Kappel, G.; et al. Quality Assessment and Quality Improvement for
+  UML Models. \emph{Software and Systems Modeling}, volume~13, no.~2, 2014: pp.
+  571--594.
+\urlprefix\biburl{https://www.swe.informatik.uni-goettingen.de/publications/quality-assessment-and-quality-improvement-uml-models}
+
+\bibitem{wrangler}
+Kandel, S.; Paepcke, A.; et al. Wrangler: Interactive Visual Specification of
+  Data Transformation Scripts. In \emph{Proceedings of the SIGCHI Conference on
+  Human Factors in Computing Systems}, ACM, 2011, pp. 3363--3372.
+\urlprefix\biburl{http://vis.stanford.edu/files/2011-Wrangler-CHI.pdf}
+
+\bibitem{falcon}
+Yakout, M.; Ouzzani, M.; et al. Interactive and Deterministic Data Cleaning. In
+  \emph{Proceedings of the 2016 International Conference on Management of Data
+  (SIGMOD)}, ACM, 2016, pp. 1205--1217.
+\urlprefix\biburl{https://dl.acm.org/doi/10.1145/2882903.2915242}
+
+\bibitem{openrefine-site}
+{OpenRefine Community}. OpenRefine. 2012, open-source tool for cleaning and
+  transforming messy data.
+\urlprefix\biburl{https://openrefine.org/}
+
+\bibitem{dsl-empirical-2025}
+Heltweg, P.; Schwarz, G.-D.; et al. Can a Domain-Specific Language Improve
+  Program Structure Comprehension of Data Pipelines? A Mixed-Methods Study.
+  2025, arXiv:2505.16764 [cs.PL].
+\urlprefix\biburl{https://arxiv.org/abs/2505.16764}
+
+\bibitem{jayvee}
+{Friedrich-Alexander Universität Erlangen-Nürnberg}. Jayvee: A
+  Domain-Specific Language for Data Pipelines. 2026, accessed: 2026-02-14.
+\urlprefix\biburl{https://jvalue.github.io/jayvee/}
+
+\bibitem{grafterizer}
+Sukhobok, D.; Nikolov, N.; et al. Tabular Data Cleaning and Linked Data
+  Generation with Grafterizer. In \emph{Proceedings of the 13th European
+  Semantic Web Conference (ESWC 2016)}, \emph{Lecture Notes in Computer
+  Science}, volume 9989, Springer, 2016, pp. 134--139,
+  \doi{10.1007/978-3-319-47602-5_27}.
+\urlprefix\biburl{https://doi.org/10.1007/978-3-319-47602-5_27}
+
+\bibitem{wrangle-language}
+{Alteryx, Inc.} Wrangle Language Reference. 2024, accessed: 2026-02-14.
+\urlprefix\biburl{https://help.alteryx.com/aac/en/trifacta-classic/wrangle-language.html}
+
+\end{thebibliography}

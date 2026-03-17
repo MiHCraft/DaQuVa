@@ -204,192 +204,205 @@ Curly braces denote zero-or-more repetition; square brackets denote an optional
 element.
 
 \begin{lstlisting}[style=bnf, caption={Complete BNF grammar of DaQuVa.}, label={lst:bnf}]
-<program> ::= <statement> <program>
-            | <empty>
-
-<empty> ::=
-
-
-<statement> ::= <db_init>
-              | <variable_assign>
-              | <function_def>
-              | <command_statement>
-
-
-<db_init> ::= "my_db" <string> ";"
-
-
-<variable_assign> ::= <identifier> "=" <command_statement> ";"
-
-
-<function_def> ::= "function" <identifier>
-                   "(" <opt_param_list> ")" ":"
-                   <statement_block>
-
-
-<opt_param_list> ::= <param_list>
-                   | <empty>
-
-
-<param_list> ::= <identifier> <param_list_tail>
-
-<param_list_tail> ::= "," <identifier> <param_list_tail>
-                    | <empty>
-
-
-<statement_block> ::= <statement> <statement_block>
-                    | <empty>
-
-
-<command_statement> ::= <scan_command>
-                      | <filter_command>
-                      | <find_duplicates_command>
-                      | <merge_command>
-                      | <output_command>
-                      | <new_table_command>
-                      | <function_call>
-
-
-<scan_command> ::= "scan" <table_column> "using" "tool" <tool_name>
-
-
-<tool_name> ::= <string>
-
-
-<table_column> ::= <table_name> "." <column_name>
-
-<table_name> ::= <string>
-
-<column_name> ::= <string>
-
-
-<filter_command> ::= "filter" <identifier> "where" <condition>
-
-
-<condition> ::= <expression> <condition_tail>
-
-
-<condition_tail> ::= <logical_op> <expression> <condition_tail>
-                   | <empty>
-
-
-<logical_op> ::= "AND"
-               | "OR"
-
-
-<expression> ::= <identifier> <comparison_op> <number>
-
-
-<comparison_op> ::= ">"
-                  | "<"
-                  | ">="
-                  | "<="
-                  | "=="
-                  | "!="
-
-
-<find_duplicates_command> ::= "findLocalDuplicates" <identifier>
-                              "columns" "[" <column_list> "]"
-                              <opt_using_tool>
-
-
-<opt_using_tool> ::= "using" "tool" <string>
-                   | <empty>
-
-
-<column_list> ::= <string> <column_list_tail>
-
-<column_list_tail> ::= "," <string> <column_list_tail>
-                     | <empty>
-
-
-<merge_command> ::= "merge" <identifier>
-                    "->" "Here" <opt_merge_offset> <opt_allow_danger>
-
-
-<opt_merge_offset> ::= "(" <number> ")"
-                     | <empty>
-
-
-<opt_allow_danger> ::= "allowDanger"
-                     | <empty>
-
-
-<output_command> ::= "output" <identifier> "->" <output_target>
-
-
-<output_target> ::= "console"
-                  | "file" <string>
-                  | "Here" <opt_output_offset>
-
-
-<opt_output_offset> ::= "(" <number> ")"
+  <SingleSpace>     ::= " "
+  
+  <OneOrMoreSpaces> ::= <SingleSpace>
+                      | <OneOrMoreSpaces> <SingleSpace>
+  
+  <opt-spaces>      ::= <OneOrMoreSpaces>
                       | <empty>
-
-
-<new_table_command> ::= "newTable" <string>
-                        <opt_from>
-                        <opt_add_columns>
-
-
-<opt_from> ::= "from" <identifier>
-             | <empty>
-
-
-<opt_add_columns> ::= "addColumns" "[" <column_func_list> "]"
-                    | <empty>
-
-
-<column_func_list> ::= <column_func> <column_func_list_tail>
-
-<column_func_list_tail> ::= "," <column_func> <column_func_list_tail>
-                          | <empty>
-
-
-<column_func> ::= <string>
-                | <func_call>
-
-
-<func_call> ::= <identifier> "(" <opt_arg_list> ")"
-
-
-<function_call> ::= <identifier> "(" <opt_arg_list> ")"
-
-
-<opt_arg_list> ::= <arg_list>
-                 | <empty>
-
-
-<arg_list> ::= <value> <arg_list_tail>
-
-<arg_list_tail> ::= "," <value> <arg_list_tail>
-                  | <empty>
-
-
-<value> ::= <identifier>
-          | <string>
-          | <number>
-
-
-<identifier> ::= <letter> <identifier_tail>
-
-<identifier_tail> ::= <letter> <identifier_tail>
-                    | <digit> <identifier_tail>
-                    | "_" <identifier_tail>
-                    | <empty>
-
-
-<number> ::= <digit> <number_tail>
-
-<number_tail> ::= <digit> <number_tail>
-                | <empty>
-
-
-<string> ::= '"' <string_body> '"'
-
-<string_body> ::= <any_char_except_quote> <string_body>
-                | <empty>\end{lstlisting}
-
+  
+  <program>         ::= <opt-spaces> <statement> <opt-spaces> <program>
+                      | <empty>
+  
+  <empty>           ::=
+  
+  
+  <statement>       ::= <opt-spaces> <db_init> <opt-spaces>
+                      | <opt-spaces> <variable_assign> <opt-spaces>
+                      | <opt-spaces> <function_def> <opt-spaces>
+                      | <opt-spaces> <command_statement> <opt-spaces>
+  
+  
+  <db_init>         ::= "my_db" <string> ";"
+  
+  
+  <variable_assign> ::= <identifier> "=" <command_statement> ";"
+  
+  
+  <function_def>    ::= "function" <identifier>
+                        "(" <opt_param_list> ")" ":"
+                        <statement_block>
+  
+  
+  <opt_param_list>  ::= <param_list>
+                      | <empty>
+  
+  
+  <param_list>      ::= <identifier> <param_list_tail>
+  
+  <param_list_tail> ::= "," <identifier> <param_list_tail>
+                      | <empty>
+  
+  
+  <statement_block> ::= <statement> <statement_block>
+                      | <empty>
+  
+  
+  <command_statement> ::= <scan_command>
+                        | <filter_command>
+                        | <find_duplicates_command>
+                        | <merge_command>
+                        | <output_command>
+                        | <new_table_command>
+                        | <function_call>
+  
+  
+  <scan_command>    ::= "scan" <table_column> "using" "tool" <tool_name>
+  
+  
+  <tool_name>       ::= <string>
+  
+  
+  <table_column>    ::= <table_name> "." <column_name>
+  
+  <table_name>      ::= <string>
+  
+  <column_name>     ::= <string>
+  
+  
+  <filter_command>  ::= "filter" <identifier> "where" <condition>
+  
+  
+  <condition>       ::= <expression> <condition_tail>
+  
+  
+  <condition_tail>  ::= <logical_op> <expression> <condition_tail>
+                      | <empty>
+  
+  
+  <logical_op>      ::= "AND"
+                      | "OR"
+  
+  
+  <expression>      ::= <identifier> <comparison_op> <number>
+  
+  
+  <comparison_op>   ::= ">"
+                      | "<"
+                      | ">="
+                      | "<="
+                      | "=="
+                      | "!="
+  
+  
+  <find_duplicates_command> ::= "findLocalDuplicates" <identifier>
+                                "columns" "[" <column_list> "]"
+                                <opt_using_tool>
+  
+  
+  <opt_using_tool>  ::= "using" "tool" <string>
+                      | <empty>
+  
+  
+  <column_list>     ::= <string> <column_list_tail>
+  
+  <column_list_tail> ::= "," <string> <column_list_tail>
+                       | <empty>
+  
+  
+  <merge_command>   ::= "merge" <identifier>
+                        "->" "Here" <opt_merge_offset> <opt_allow_danger>
+  
+  
+  <opt_merge_offset> ::= "(" <number> ")"
+                       | <empty>
+  
+  
+  <opt_allow_danger> ::= "allowDanger"
+                       | <empty>
+  
+  
+  <output_command>  ::= "output" <identifier> "->" <output_target>
+  
+  
+  <output_target>   ::= "console"
+                      | "file" <string>
+                      | "Here" <opt_output_offset>
+  
+  
+  <opt_output_offset> ::= "(" <number> ")"
+                        | <empty>
+  
+  
+  <new_table_command> ::= "newTable" <string>
+                          <opt_from>
+                          <opt_add_columns>
+  
+  
+  <opt_from>        ::= "from" <identifier>
+                      | <empty>
+  
+  
+  <opt_add_columns> ::= "addColumns" "[" <column_func_list> "]"
+                      | <empty>
+  
+  
+  <column_func_list> ::= <column_func> <column_func_list_tail>
+  
+  <column_func_list_tail> ::= "," <column_func> <column_func_list_tail>
+                            | <empty>
+  
+  
+  <column_func>     ::= <string>
+                      | <func_call>
+  
+  
+  <func_call>       ::= <identifier> "(" <opt_arg_list> ")"
+  
+  
+  <function_call>   ::= <identifier> "(" <opt_arg_list> ")"
+  
+  
+  <opt_arg_list>    ::= <arg_list>
+                      | <empty>
+  
+  
+  <arg_list>        ::= <value> <arg_list_tail>
+  
+  <arg_list_tail>   ::= "," <value> <arg_list_tail>
+                      | <empty>
+  
+  
+  <value>           ::= <identifier>
+                      | <string>
+                      | <number>
+  
+  
+  <identifier>      ::= <letter> <identifier_tail>
+  
+  <identifier_tail> ::= <letter> <identifier_tail>
+                      | <digit> <identifier_tail>
+                      | "_" <identifier_tail>
+                      | <empty>
+  
+  
+  <number>          ::= <digit> <number_tail>
+  
+  <number_tail>     ::= <digit> <number_tail>
+                      | <empty>
+  
+  
+  <string>          ::= '"' <string_body> '"'
+  
+  <string_body>     ::= <any_char_except_quote> <string_body>
+                      | <empty>
+  
+  (* Note: <opt-spaces> and <OneOrMoreSpaces> may appear between any two tokens
+     (except inside literals, identifiers, numbers and multi-character operators).
+     They are shown only in the top-level rules for brevity; the rest of the grammar
+     follows the same whitespace-insensitive convention. *)
+  \end{lstlisting}
 \subsection{Core Syntactic Structures}
 
 \subsubsection{Program and Statements}

@@ -1,0 +1,60 @@
+# connect to database
+my_db "some_connection_string_goes_here";
+# this DSL within Univer projecgt will work for now only with ONE database.
+# So, we use only ONE string for connection.
+
+# we can create some functions in this DSL
+function cleanEmails (table_name, threshold) {
+    # inside the brackets goes the instructions for function
+
+    #some sample_code
+    # command: scan
+    # what to /command/: table_name."email" (column)
+    # strategy of doing /command/: misa_ai_validator
+    potenrial_dirty = scan table_name."email" using tool "misa_ai_validator";
+
+    # command: filter
+    # what to /command/: potential_dirty WHERE.. (restrictions) dirty_level > threshold;
+    # strategy: default
+    high_risk = filter potential_dirty where dirty_level > threshold;
+    
+    # the function returns the value, even if there were not specified what type of function is it. and what type it should return, how in another languages
+    return high_risk;
+}
+
+# call the function:
+high_risk_emails = cleanEmails("users", 70);
+
+# export results
+output high_risk_emails -> file "high_risk_emails.csv";
+output high_risk_emails -> console;
+
+# detect near-duplicate records on high_risk rows
+# command findLocalDuplicates 
+# what to /command/: high_risk_emails columns ["name", "dob"] 
+# one column: high_risk_emails column "name"
+# or: high_risk_emails.name
+# or: high_risk_emails.[name,dob]
+# strategy: "fuzzy_matcher"
+duplicates = findLocalDuplicates high_risk_emails
+                columns ["name", "dob"]
+                using tool "fuzzy_matcher";
+
+# command: merge
+# what to /command/: duplicates
+# where to output: IN THIS EXACT DATABASE
+# allowDanger flag for updating this database
+marge duplicates -> Here(90) allowDanger;
+
+analysis_table = newTable "high_risk_analysis"
+        from high_risk
+        addColumns [duplicate_score, length("name")];
+
+cli_result = scan analysis_table."email" using tool "typo_checker";
+output cli_result -> console;
+
+
+
+
+
+variable can be a table or a number or a string. Maybe to add datatype;

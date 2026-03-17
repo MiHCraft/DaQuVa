@@ -51,9 +51,9 @@
 \contentsline {subsubsection}{Whitespace and Layout}{21}{subsubsection*.41}%
 \contentsline {subsubsection}{Operators and Punctuation}{22}{subsubsection*.42}%
 \contentsline {subsection}{\numberline {2.2.3}Syntactic Grammar in BNF}{23}{subsection.2.2.3}%
-\contentsline {subsection}{\numberline {2.2.4}Core Syntactic Structures}{29}{subsection.2.2.4}%
-\contentsline {subsubsection}{Program and Statements}{29}{subsubsection*.44}%
-\contentsline {subsubsection}{Expressions and Conditions}{29}{subsubsection*.45}%
+\contentsline {subsection}{\numberline {2.2.4}Core Syntactic Structures}{30}{subsection.2.2.4}%
+\contentsline {subsubsection}{Program and Statements}{30}{subsubsection*.44}%
+\contentsline {subsubsection}{Expressions and Conditions}{30}{subsubsection*.45}%
 \contentsline {subsubsection}{Functions}{30}{subsubsection*.46}%
 \contentsline {section}{\numberline {2.3}Basic DSL Semantics}{30}{section.2.3}%
 \contentsline {subsection}{\numberline {2.3.1}Execution Model}{30}{subsection.2.3.1}%
@@ -79,15 +79,14 @@
 \contentsline {subsection}{\numberline {2.5.8}newTable Command}{38}{subsection.2.5.8}%
 \contentsline {section}{\numberline {2.6}Summary}{38}{section.2.6}%
 \contentsline {chapter}{\numberline {3}DSL Implementation}{39}{chapter.3}%
-\contentsline {section}{\numberline {3.1}lexer}{39}{section.3.1}%
-\contentsline {section}{\numberline {3.2}parser}{39}{section.3.2}%
-\contentsline {section}{\numberline {3.3}AST}{39}{section.3.3}%
-\contentsline {section}{\numberline {3.4}semantic analysis}{39}{section.3.4}%
-\contentsline {section}{\numberline {3.5}execution engine}{39}{section.3.5}%
-\contentsline {chapter}{\numberline {4}Evaluation \& Experiments}{40}{chapter.4}%
-\contentsline {section}{\numberline {4.1}Experimant 1}{40}{section.4.1}%
-\contentsline {section}{\numberline {4.2}Experimant 2}{40}{section.4.2}%
-\contentsline {chapter}{\numberline {5}Discussion}{41}{chapter.5}%
-\contentsline {section}{\numberline {5.1}What was good}{41}{section.5.1}%
-\contentsline {section}{\numberline {5.2}What comes to be bad}{41}{section.5.2}%
-\contentsline {chapter}{Conclusions}{42}{section.5.2}%
+\contentsline {section}{\numberline {3.1}Lexer}{39}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Parser}{41}{section.3.2}%
+\contentsline {section}{\numberline {3.3}execution engine}{42}{section.3.3}%
+\contentsline {chapter}{\numberline {4}Evaluation \& Experiments}{43}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Experimant 1}{43}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Experimant 2}{43}{section.4.2}%
+\contentsline {chapter}{\numberline {5}Discussion}{44}{chapter.5}%
+\contentsline {section}{\numberline {5.1}What was good}{44}{section.5.1}%
+\contentsline {section}{\numberline {5.2}What comes to be bad}{44}{section.5.2}%
+\contentsline {chapter}{Conclusions}{45}{section.5.2}%
+\contentsline {chapter}{Bibliography}{46}{section*.57}%
