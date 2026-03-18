@@ -89,4 +89,8 @@
 \contentsline {section}{\numberline {5.1}What was good}{44}{section.5.1}%
 \contentsline {section}{\numberline {5.2}What comes to be bad}{44}{section.5.2}%
 \contentsline {chapter}{Conclusions}{45}{section.5.2}%
-\contentsline {chapter}{Bibliography}{46}{section*.57}%
+\contentsline {chapter}{\numberline {A}Appendix}{46}{appendix.A}%
+\contentsline {section}{\numberline {A.1}PBL Problem Map}{47}{section.A.1}%
+\contentsline {section}{\numberline {A.2}Project Plan}{51}{section.A.2}%
+\contentsline {section}{\numberline {A.3}Team Contract}{52}{section.A.3}%
+\contentsline {chapter}{Bibliography}{53}{section*.57}%

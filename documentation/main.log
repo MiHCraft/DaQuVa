@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.10.4)  17 MAR 2026 23:06
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.10.4)  18 MAR 2026 20:25
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1106,7 +1106,7 @@ Package: inlinedef 2008/07/10 v1.0 Inlined expansions within definitions
 ! Extra \fi.
 <argument> ...op@@ }\expandafter \@firstofone \fi 
                                                   
-l.18 \usepackage
+l.15 \usepackage
                 {adjustbox}
 I'm ignoring this; it doesn't match any \if.
 
@@ -1165,12 +1165,53 @@ Package: varwidth 2009/03/30 ver 0.92;  Variable-width minipages
 \@vwid@loff=\dimen312
 \@vwid@roff=\dimen313
 ))
+(/usr/local/texlive/2025/texmf-dist/tex/latex/pdfpages/pdfpages.sty
+Package: pdfpages 2025/01/30 v0.6e Insert pages of external PDF documents (AM)
+
+(/usr/local/texlive/2025/texmf-dist/tex/latex/base/ifthen.sty
+Package: ifthen 2024/03/16 v1.1e Standard LaTeX ifthen package (DPC)
+)
+(/usr/local/texlive/2025/texmf-dist/tex/latex/tools/calc.sty
+Package: calc 2023/07/08 v4.3 Infix arithmetic (KKT,FJ)
+\calc@Acount=\count402
+\calc@Bcount=\count403
+\calc@Adimen=\dimen314
+\calc@Bdimen=\dimen315
+\calc@Askip=\skip121
+\calc@Bskip=\skip122
+LaTeX Info: Redefining \setlength on input line 80.
+LaTeX Info: Redefining \addtolength on input line 81.
+\calc@Ccount=\count404
+\calc@Cskip=\skip123
+)
+\AM@pagewidth=\dimen316
+\AM@pageheight=\dimen317
+\AM@fboxrule=\dimen318
+
+(/usr/local/texlive/2025/texmf-dist/tex/latex/pdfpages/pppdftex.def
+File: pppdftex.def 2025/01/30 v0.6e Pdfpages driver for pdfTeX (AM)
+)
+\pdfpages@includegraphics@status=\count405
+\AM@pagebox=\box95
+\AM@global@opts=\toks62
+\AM@pagecnt=\count406
+\AM@toc@title=\toks63
+\AM@lof@heading=\toks64
+\c@AM@survey=\count407
+\AM@templatesizebox=\box96
+)
+(/usr/local/texlive/2025/texmf-dist/tex/latex/appendix/appendix.sty
+Package: appendix 2020/02/08 v1.2c extra appendix facilities
+\c@@pps=\count408
+\c@@ppsavesec=\count409
+\c@@ppsaveapp=\count410
+)
 Package csquotes Info: Checking for multilingual support...
 Package csquotes Info: ... found 'babel' package.
 Package csquotes Info: Adjusting default style.
 Package csquotes Info: Redefining alias 'default' -> 'english'.
 LaTeX Font Info:    Trying to load font information for OT1+ptm on input line 3
-9.
+7.
 
 (/usr/local/texlive/2025/texmf-dist/tex/latex/psnfss/ot1ptm.fd
 File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
@@ -1181,48 +1222,48 @@ LaTeX Warning: Label `tab:entities' multiply defined.
 )
 \openout1 = `main.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 39.
-LaTeX Font Info:    ... okay on input line 39.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 39.
-LaTeX Font Info:    ... okay on input line 39.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 39.
-LaTeX Font Info:    ... okay on input line 39.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 39.
-LaTeX Font Info:    ... okay on input line 39.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 39.
-LaTeX Font Info:    ... okay on input line 39.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 39.
-LaTeX Font Info:    ... okay on input line 39.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 39.
-LaTeX Font Info:    ... okay on input line 39.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 39.
-LaTeX Font Info:    ... okay on input line 39.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 39.
-LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 37.
+LaTeX Font Info:    ... okay on input line 37.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 37.
+LaTeX Font Info:    ... okay on input line 37.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 37.
+LaTeX Font Info:    ... okay on input line 37.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 37.
+LaTeX Font Info:    ... okay on input line 37.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 37.
+LaTeX Font Info:    ... okay on input line 37.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 37.
+LaTeX Font Info:    ... okay on input line 37.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 37.
+LaTeX Font Info:    ... okay on input line 37.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 37.
+LaTeX Font Info:    ... okay on input line 37.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 37.
+LaTeX Font Info:    ... okay on input line 37.
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: subfig package v1.3 is loaded.
 Package caption Info: float package is loaded.
 Package caption Info: hyperref package is loaded.
 Package caption Info: listings package is loaded.
 Package caption Info: scrextend package is loaded.
-\caption@addmargin@hsize=\dimen314
-\caption@addmargin@linewidth=\dimen315
+\caption@addmargin@hsize=\dimen319
+\caption@addmargin@linewidth=\dimen320
 Package caption Info: End \AtBeginDocument code.
 Package newfloat Info: `float' package detected.
 
 (/usr/local/texlive/2025/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count402
-\scratchdimen=\dimen316
-\scratchbox=\box95
-\nofMPsegments=\count403
-\nofMParguments=\count404
-\everyMPshowfont=\toks62
-\MPscratchCnt=\count405
-\MPscratchDim=\dimen317
-\MPnumerator=\count406
-\makeMPintoPDFobject=\count407
-\everyMPtoPDFconversion=\toks63
+\scratchcounter=\count411
+\scratchdimen=\dimen321
+\scratchbox=\box97
+\nofMPsegments=\count412
+\nofMParguments=\count413
+\everyMPshowfont=\toks65
+\MPscratchCnt=\count414
+\MPscratchDim=\dimen322
+\MPnumerator=\count415
+\makeMPintoPDFobject=\count416
+\everyMPtoPDFconversion=\toks66
 )
 (/usr/local/texlive/2025/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
@@ -1267,13 +1308,26 @@ e
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-\c@lstlisting=\count408
-Package hyperref Info: Link coloring OFF on input line 39.
+\c@lstlisting=\count417
+Package hyperref Info: Link coloring OFF on input line 37.
  (./main.out) (./main.out)
 \@outlinefile=\write5
 \openout5 = `main.out'.
 
- (./tex_files/title_page.tex
+
+(/usr/local/texlive/2025/texmf-dist/tex/latex/pdflscape/pdflscape.sty
+Package: pdflscape 2022-10-27 v0.13 Display of landscape pages in PDF
+
+(/usr/local/texlive/2025/texmf-dist/tex/latex/pdflscape/pdflscape-nometadata.st
+y
+Package: pdflscape-nometadata 2022-10-28 v0.13 Display of landscape pages in PD
+F (HO)
+
+(/usr/local/texlive/2025/texmf-dist/tex/latex/graphics/lscape.sty
+Package: lscape 2020/05/28 v3.02 Landscape Pages (DPC)
+)
+Package pdflscape Info: Auto-detected driver: pdftex on input line 81.
+)) (./tex_files/title_page.tex
 LaTeX Font Info:    Trying to load font information for OT1+ztmcm on input line
  27.
 
@@ -2607,7 +2661,201 @@ Chapter 5.
  [45
 
 
-] (./main.bbl
+] (./tex_files/appendix.tex
+Appendix A.
+<appendicies/pbl-problem-map.pdf, id=979, 597.50829pt x 845.0471pt>
+File: appendicies/pbl-problem-map.pdf Graphic file (type pdf)
+<use appendicies/pbl-problem-map.pdf>
+Package pdftex.def Info: appendicies/pbl-problem-map.pdf  used on input line 9.
+
+(pdftex.def)             Requested size: 597.50682pt x 845.04504pt.
+<appendicies/pbl-problem-map.pdf, id=981, page=1, 597.50829pt x 845.0471pt>
+File: appendicies/pbl-problem-map.pdf Graphic file (type pdf)
+<use appendicies/pbl-problem-map.pdf, page 1>
+Package pdftex.def Info: appendicies/pbl-problem-map.pdf , page1 used on input 
+line 9.
+(pdftex.def)             Requested size: 423.98769pt x 599.6395pt.
+File: appendicies/pbl-problem-map.pdf Graphic file (type pdf)
+<use appendicies/pbl-problem-map.pdf, page 1>
+Package pdftex.def Info: appendicies/pbl-problem-map.pdf , page1 used on input 
+line 9.
+(pdftex.def)             Requested size: 842.93355pt x 1192.14842pt.
+
+
+ [46
+
+
+]
+File: appendicies/pbl-problem-map.pdf Graphic file (type pdf)
+<use appendicies/pbl-problem-map.pdf, page 1>
+Package pdftex.def Info: appendicies/pbl-problem-map.pdf , page1 used on input 
+line 9.
+(pdftex.def)             Requested size: 842.93355pt x 1192.14842pt.
+File: appendicies/pbl-problem-map.pdf Graphic file (type pdf)
+<use appendicies/pbl-problem-map.pdf, page 1>
+Package pdftex.def Info: appendicies/pbl-problem-map.pdf , page1 used on input 
+line 9.
+(pdftex.def)             Requested size: 842.93355pt x 1192.14842pt.
+
+
+File: appendicies/pbl-problem-map.pdf Graphic file (type pdf)
+<use appendicies/pbl-problem-map.pdf, page 1>
+Package pdftex.def Info: appendicies/pbl-problem-map.pdf , page1 used on input 
+line 9.
+(pdftex.def)             Requested size: 842.93355pt x 1192.14842pt.
+ [47
+
+ <./appendicies/pbl-problem-map.pdf>]
+File: appendicies/pbl-problem-map.pdf Graphic file (type pdf)
+<use appendicies/pbl-problem-map.pdf>
+Package pdftex.def Info: appendicies/pbl-problem-map.pdf  used on input line 15
+.
+(pdftex.def)             Requested size: 597.50682pt x 845.04504pt.
+<appendicies/pbl-problem-map.pdf, id=1010, page=2, 597.50829pt x 845.0471pt>
+File: appendicies/pbl-problem-map.pdf Graphic file (type pdf)
+<use appendicies/pbl-problem-map.pdf, page 2>
+Package pdftex.def Info: appendicies/pbl-problem-map.pdf , page2 used on input 
+line 15.
+(pdftex.def)             Requested size: 423.98769pt x 599.6395pt.
+File: appendicies/pbl-problem-map.pdf Graphic file (type pdf)
+<use appendicies/pbl-problem-map.pdf, page 2>
+Package pdftex.def Info: appendicies/pbl-problem-map.pdf , page2 used on input 
+line 15.
+(pdftex.def)             Requested size: 842.93355pt x 1192.14842pt.
+File: appendicies/pbl-problem-map.pdf Graphic file (type pdf)
+<use appendicies/pbl-problem-map.pdf, page 2>
+Package pdftex.def Info: appendicies/pbl-problem-map.pdf , page2 used on input 
+line 15.
+(pdftex.def)             Requested size: 842.93355pt x 1192.14842pt.
+File: appendicies/pbl-problem-map.pdf Graphic file (type pdf)
+<use appendicies/pbl-problem-map.pdf, page 2>
+Package pdftex.def Info: appendicies/pbl-problem-map.pdf , page2 used on input 
+line 15.
+(pdftex.def)             Requested size: 842.93355pt x 1192.14842pt.
+
+
+File: appendicies/pbl-problem-map.pdf Graphic file (type pdf)
+<use appendicies/pbl-problem-map.pdf, page 2>
+Package pdftex.def Info: appendicies/pbl-problem-map.pdf , page2 used on input 
+line 15.
+(pdftex.def)             Requested size: 842.93355pt x 1192.14842pt.
+ [48
+
+ <./appendicies/pbl-problem-map.pdf>]
+<appendicies/pbl-problem-map.pdf, id=1019, page=3, 597.50829pt x 845.0471pt>
+File: appendicies/pbl-problem-map.pdf Graphic file (type pdf)
+<use appendicies/pbl-problem-map.pdf, page 3>
+Package pdftex.def Info: appendicies/pbl-problem-map.pdf , page3 used on input 
+line 15.
+(pdftex.def)             Requested size: 842.93355pt x 1192.14842pt.
+File: appendicies/pbl-problem-map.pdf Graphic file (type pdf)
+<use appendicies/pbl-problem-map.pdf, page 3>
+Package pdftex.def Info: appendicies/pbl-problem-map.pdf , page3 used on input 
+line 15.
+(pdftex.def)             Requested size: 842.93355pt x 1192.14842pt.
+
+
+File: appendicies/pbl-problem-map.pdf Graphic file (type pdf)
+<use appendicies/pbl-problem-map.pdf, page 3>
+Package pdftex.def Info: appendicies/pbl-problem-map.pdf , page3 used on input 
+line 15.
+(pdftex.def)             Requested size: 842.93355pt x 1192.14842pt.
+ [49
+
+ <./appendicies/pbl-problem-map.pdf>]
+<appendicies/pbl-problem-map.pdf, id=1025, page=4, 597.50829pt x 845.0471pt>
+File: appendicies/pbl-problem-map.pdf Graphic file (type pdf)
+<use appendicies/pbl-problem-map.pdf, page 4>
+Package pdftex.def Info: appendicies/pbl-problem-map.pdf , page4 used on input 
+line 15.
+(pdftex.def)             Requested size: 842.93355pt x 1192.14842pt.
+File: appendicies/pbl-problem-map.pdf Graphic file (type pdf)
+<use appendicies/pbl-problem-map.pdf, page 4>
+Package pdftex.def Info: appendicies/pbl-problem-map.pdf , page4 used on input 
+line 15.
+(pdftex.def)             Requested size: 842.93355pt x 1192.14842pt.
+
+
+File: appendicies/pbl-problem-map.pdf Graphic file (type pdf)
+<use appendicies/pbl-problem-map.pdf, page 4>
+Package pdftex.def Info: appendicies/pbl-problem-map.pdf , page4 used on input 
+line 15.
+(pdftex.def)             Requested size: 842.93355pt x 1192.14842pt.
+ [50
+
+ <./appendicies/pbl-problem-map.pdf>]
+<appendicies/project-plan.pdf, id=1030, 597.50829pt x 845.0471pt>
+File: appendicies/project-plan.pdf Graphic file (type pdf)
+<use appendicies/project-plan.pdf>
+Package pdftex.def Info: appendicies/project-plan.pdf  used on input line 22.
+(pdftex.def)             Requested size: 597.50682pt x 845.04504pt.
+<appendicies/project-plan.pdf, id=1032, page=1, 597.50829pt x 845.0471pt>
+File: appendicies/project-plan.pdf Graphic file (type pdf)
+<use appendicies/project-plan.pdf, page 1>
+Package pdftex.def Info: appendicies/project-plan.pdf , page1 used on input lin
+e 22.
+(pdftex.def)             Requested size: 423.98769pt x 599.6395pt.
+File: appendicies/project-plan.pdf Graphic file (type pdf)
+<use appendicies/project-plan.pdf, page 1>
+Package pdftex.def Info: appendicies/project-plan.pdf , page1 used on input lin
+e 22.
+(pdftex.def)             Requested size: 842.93355pt x 1192.14842pt.
+File: appendicies/project-plan.pdf Graphic file (type pdf)
+<use appendicies/project-plan.pdf, page 1>
+Package pdftex.def Info: appendicies/project-plan.pdf , page1 used on input lin
+e 22.
+(pdftex.def)             Requested size: 842.93355pt x 1192.14842pt.
+File: appendicies/project-plan.pdf Graphic file (type pdf)
+<use appendicies/project-plan.pdf, page 1>
+Package pdftex.def Info: appendicies/project-plan.pdf , page1 used on input lin
+e 22.
+(pdftex.def)             Requested size: 842.93355pt x 1192.14842pt.
+
+
+File: appendicies/project-plan.pdf Graphic file (type pdf)
+<use appendicies/project-plan.pdf, page 1>
+Package pdftex.def Info: appendicies/project-plan.pdf , page1 used on input lin
+e 22.
+(pdftex.def)             Requested size: 842.93355pt x 1192.14842pt.
+ [51
+
+ <./appendicies/project-plan.pdf>]
+<appendicies/team-contract.pdf, id=1058, 597.432pt x 845.07718pt>
+File: appendicies/team-contract.pdf Graphic file (type pdf)
+<use appendicies/team-contract.pdf>
+Package pdftex.def Info: appendicies/team-contract.pdf  used on input line 29.
+(pdftex.def)             Requested size: 597.43054pt x 845.07512pt.
+<appendicies/team-contract.pdf, id=1060, page=1, 597.432pt x 845.07718pt>
+File: appendicies/team-contract.pdf Graphic file (type pdf)
+<use appendicies/team-contract.pdf, page 1>
+Package pdftex.def Info: appendicies/team-contract.pdf , page1 used on input li
+ne 29.
+(pdftex.def)             Requested size: 423.9062pt x 599.62216pt.
+File: appendicies/team-contract.pdf Graphic file (type pdf)
+<use appendicies/team-contract.pdf, page 1>
+Package pdftex.def Info: appendicies/team-contract.pdf , page1 used on input li
+ne 29.
+(pdftex.def)             Requested size: 842.82593pt x 1192.19086pt.
+File: appendicies/team-contract.pdf Graphic file (type pdf)
+<use appendicies/team-contract.pdf, page 1>
+Package pdftex.def Info: appendicies/team-contract.pdf , page1 used on input li
+ne 29.
+(pdftex.def)             Requested size: 842.82593pt x 1192.19086pt.
+File: appendicies/team-contract.pdf Graphic file (type pdf)
+<use appendicies/team-contract.pdf, page 1>
+Package pdftex.def Info: appendicies/team-contract.pdf , page1 used on input li
+ne 29.
+(pdftex.def)             Requested size: 842.82593pt x 1192.19086pt.
+
+
+File: appendicies/team-contract.pdf Graphic file (type pdf)
+<use appendicies/team-contract.pdf, page 1>
+Package pdftex.def Info: appendicies/team-contract.pdf , page1 used on input li
+ne 29.
+(pdftex.def)             Requested size: 842.82593pt x 1192.19086pt.
+ [52
+
+ <./appendicies/team-contract.pdf>]) (./main.bbl
 Underfull \hbox (badness 3439) in paragraph at lines 36--40
 []\OT1/ptm/m/n/12 Langer, P.; Kap-pel, G.; et al. Qual-ity As-sess-ment and Qua
 l-ity Im-prove-ment for UML
@@ -2627,12 +2875,12 @@ formatik . uni-[]goettingen . de / publications /
 
 
 
- [46
+ [53
 
 
 ])
 
- [47] (./main.aux)
+ [54] (./main.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
@@ -2641,30 +2889,35 @@ L3 programming layer <2025-01-18>
 LaTeX Warning: There were multiply-defined labels.
 
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 1D6E4C5E418072C7EE07BD3DEF2353C6;8363.
+(rerunfilecheck)             Checksum: E0C1A29246D5EA07A9477E3B18A42114;8828.
  ) 
 Here is how much of TeX's memory you used:
- 42324 strings out of 473190
- 882194 string characters out of 5715800
- 1558928 words of memory out of 5000000
- 64377 multiletter control sequences out of 15000+600000
+ 43252 strings out of 473190
+ 899625 string characters out of 5715800
+ 1573742 words of memory out of 5000000
+ 65266 multiletter control sequences out of 15000+600000
  595032 words of font info for 110 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 145i,20n,134p,1602b,2027s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 145i,20n,134p,1602b,2029s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb
 ></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb>
 </usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></
 usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></u
 sr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></us
 r/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb></usr
-/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sftt1200.pfb></usr/l
-ocal/texlive/2025/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texli
-ve/2025/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2025/te
-xmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on main.pdf (47 pages, 259790 bytes).
+/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfbx1200.pfb></usr/l
+ocal/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfbx1728.pfb></usr/loc
+al/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfrm1095.pfb></usr/local
+/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfrm1200.pfb></usr/local/t
+exlive/2025/texmf-dist/fonts/type1/public/cm-super/sfrm1728.pfb></usr/local/tex
+live/2025/texmf-dist/fonts/type1/public/cm-super/sftt1200.pfb></usr/local/texli
+ve/2025/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2025/te
+xmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2025/texmf-dist/f
+onts/type1/urw/times/utmri8a.pfb>
+Output written on main.pdf (54 pages, 926035 bytes).
 PDF statistics:
- 1149 PDF objects out of 1200 (max. 8388607)
- 1069 compressed objects within 11 object streams
- 547 named destinations out of 1000 (max. 500000)
- 437 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1268 PDF objects out of 1440 (max. 8388607)
+ 1152 compressed objects within 12 object streams
+ 558 named destinations out of 1000 (max. 500000)
+ 534 words of extra memory for PDF output out of 10000 (max. 10000000)
 

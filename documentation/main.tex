@@ -1,22 +1,20 @@
 \documentclass{tum_report}
 
-
-\bibliographystyle{tex_files/bibliography/styles/iso690} % downloaded from some chech uni
+\bibliographystyle{tex_files/bibliography/styles/iso690}
 
 % Make \paragraph a block heading (new line after it)
 \usepackage{titlesec}
-
 \titleformat{\paragraph}[block]
   {\normalfont\normalsize\bfseries}
   {\theparagraph}{1em}{}
-
 \titlespacing*{\paragraph}{0pt}{1.2ex}{0.6ex}
 
- \usepackage{float}      
+\usepackage{float}
 \usepackage{placeins}
 \usepackage{forest}
 \usepackage{adjustbox}
-
+\usepackage{pdfpages}
+\usepackage{appendix}
 
 \forestset{
   daqtree/.style={
@@ -34,8 +32,8 @@
   }
 }
 
-
 \newcommand{\bnf}[1]{\texttt{\langle #1 \rangle}}
+
 \begin{document}
 
     \input{tex_files/title_page}
@@ -70,14 +68,12 @@
     \input{tex_files/conclusion}
     \clearpage
     
+    \input{tex_files/appendix}
+    \clearpage
+    
     \phantomsection
     \addcontentsline{toc}{chapter}{Bibliography}
-
-    % you can use either .bib format or .tex. Please, do not use both, comment the one you don't need.
     \nocite{*} 
-    \bibliography{tex_files/bibliography/bibliography} % .bib
-
-
-    % \input{tex_files/bibliography/bibliography} % simply .tex
+    \bibliography{tex_files/bibliography/bibliography}
 
 \end{document}
