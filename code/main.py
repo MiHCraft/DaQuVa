@@ -834,7 +834,7 @@ output highriskeamils -> console;
 duplicates = findLocalDuplicates highriskeamils columns ["name", "dob"] using tool "fuzzymatcher";
 
 # === 6. Merge duplicates back into the database (confidence >= 90%) ===
-merge duplicates -> Here(90) allowDanger;
+merge duplicates -> here(90) allowDanger;
 
 # === 7. Create a summary table for downstream analysis ===
 analysistable = newTable "highriskanalysis"
