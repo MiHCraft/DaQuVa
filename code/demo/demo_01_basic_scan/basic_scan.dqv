@@ -1,0 +1,7 @@
+csv people "input/people.csv";
+sqlite out "output/basic_scan.sqlite";
+
+scanned = scan people.people using_tool row_counter;
+
+scanned -> file "output/scanned_people.csv";
+save scanned into scanned_people allowDanger;

@@ -1,0 +1,3 @@
+id,name,email,age,typo_suspect,typo_suggestion,typo_distance,merged_from_count
+1,Alice Johnson,alice@example.com,31,False,,,2
+5,Carla Smith,carla@gmail.com,24,False,,,2

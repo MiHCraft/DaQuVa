@@ -1,0 +1,12 @@
+csv leads "input/leads.csv";
+sqlite out "output/pipeline.sqlite";
+
+raw = scan leads.leads using_tool typo_detector("email");
+adults = filter raw where age >= 18;
+dupes = find_duplicates adults[name] using tool fuzzy_duplicates(2);
+merged = merge dupes;
+
+raw -> file "output/typo_analysis.csv";
+dupes -> file "output/duplicate_analysis.csv";
+merged -> file "output/pipeline_cleaned.csv";
+save merged into cleaned_leads allowDanger;

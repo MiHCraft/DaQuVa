@@ -1,0 +1,10 @@
+csv subscriptions "input/subscriptions.csv";
+sqlite out "output/csv_output.sqlite";
+
+subscriptions = scan subscriptions.records;
+active = filter subscriptions where status == "active";
+cleaned = edit_rows active where email starts_with "support@" set status = "internal";
+final = edit_columns cleaned rename full_name to name;
+
+final -> file "output/cleaned_subscriptions.csv";
+save final into cleaned_subscriptions allowDanger;

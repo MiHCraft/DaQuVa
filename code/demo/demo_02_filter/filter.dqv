@@ -1,0 +1,8 @@
+csv people "input/people.csv";
+sqlite out "output/filter.sqlite";
+
+people = scan people.people;
+adults = filter people where age >= 18;
+
+adults -> file "output/adults.csv";
+save adults into adults allowDanger;

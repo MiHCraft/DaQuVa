@@ -1,0 +1,4 @@
+id,customer_id,amount,status
+2,1,150.0,paid
+3,2,220.0,pending
+5,4,310.0,paid

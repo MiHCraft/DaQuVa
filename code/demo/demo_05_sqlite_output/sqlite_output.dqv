@@ -1,0 +1,8 @@
+sqlite main "input/employees.sqlite";
+sqlite out "output/sqlite_output.sqlite";
+
+employees = scan main.employees;
+senior = filter employees where salary >= 70000;
+
+senior -> file "output/senior_employees.csv";
+save senior into senior_employees allowDanger;

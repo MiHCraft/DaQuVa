@@ -1,0 +1,4 @@
+id,name,email,age,merged_from_count
+1,Alice Johnson,alice@example.com,31,2
+3,Bob Stone,bob@example.com,28,2
+5,Carla Smith,carla@example.com,40,1

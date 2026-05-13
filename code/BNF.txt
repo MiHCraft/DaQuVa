@@ -1,0 +1,598 @@
+// ============================================================
+// DaQuVa BNF Grammar
+// Data Query Validation DSL
+// ============================================================
+
+
+// ============================================================
+// SIMPLE VALUES / SYMBOLS / BASIC TOKENS
+// ============================================================
+
+<empty> ::= 
+
+<decimal_digit> ::= 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+
+<decimal_number> ::= <decimal_digit> <decimal_number>
+                   | <decimal_digit>
+
+<floating_number> ::= <decimal_number>
+                    | <decimal_number>.
+                    | <decimal_number>.<decimal_number>
+
+<number> ::= <floating_number>
+           | <decimal_number>
+
+<alphabetic_character_en> ::= A | B | C | D | E | F | G | H | I
+                            | J | K | L | M | N | O | P | Q | R
+                            | S | T | U | V | W | X | Y | Z
+                            | a | b | c | d | e | f | g | h | i
+                            | j | k | l | m | n | o | p | q | r
+                            | s | t | u | v | w | x | y | z
+
+<open_triangle_bracket> ::= <
+<close_triangle_bracket> ::= >
+<bar_symbol> ::= |
+
+<special_symbol> ::= !
+                   | @
+                   | #
+                   | $
+                   | %
+                   | ^
+                   | &
+                   | *
+                   | (
+                   | )
+                   | _
+                   | -
+                   | =
+                   | +
+                   | [
+                   | ]
+                   | {
+                   | }
+                   | '
+                   | \"
+                   | \
+                   | /
+                   | ?
+                   | .
+                   | ,
+                   | :
+                   | <open_triangle_bracket>
+                   | <close_triangle_bracket>
+                   | <bar_symbol>
+
+<space_character> ::= " "
+
+<space> ::= <space_character>
+
+<multiple_spaces> ::= <space_character> <multiple_spaces>
+                    | <space_character>
+
+<optional_spaces> ::= <empty>
+                    | <multiple_spaces>
+
+<boolean_value> ::= true
+                  | false
+
+<string_char> ::= <decimal_digit>
+                | <alphabetic_character_en>
+                | <special_symbol>
+                | <space_character>
+                | <empty>
+
+<string_line> ::= <string_char> <string_line>
+                | <string_char>
+
+<string> ::= "<string_line>"
+
+<allowed_first_char_in_variable_names> ::= _
+                                         | <alphabetic_character_en>
+
+<allowed_char_in_variable> ::= <decimal_digit>
+                             | <alphabetic_character_en>
+                             | _
+
+<allowed_char_in_variables> ::= <allowed_char_in_variable> <allowed_char_in_variables>
+                              | <allowed_char_in_variable>
+
+<variable_name> ::= <allowed_first_char_in_variable_names>
+                  | <allowed_first_char_in_variable_names>
+                    <allowed_char_in_variables>
+
+<identifier> ::= <variable_name>
+
+<value> ::= <number>
+          | <string>
+          | <boolean_value>
+
+<value_or_variable> ::= <value>
+                      | <variable_name>
+
+<variable_type> ::= number
+                  | string
+                  | bool
+                  | table
+
+
+// ============================================================
+// OPERATORS
+// ============================================================
+
+<assign_sign> ::= =
+
+<equal_sign> ::= ==
+
+<compare_more_sign> ::= >
+
+<compare_less_sign> ::= <
+
+<compare_less_or_equal_sign> ::= <=
+
+<compare_more_or_equal_sign> ::= >=
+
+<not_equal_sign> ::= !=
+
+<plus_sign> ::= +
+
+<minus_sign> ::= -
+
+<multiply_sign> ::= *
+
+<divide_sign> ::= /
+
+<divide_int> ::= div
+
+<semicolon> ::= ;
+
+
+// ============================================================
+// PROGRAM STRUCTURE
+// ============================================================
+
+<Program> ::= <empty>
+            | <program_block>
+
+<program_block> ::= <connections_block>
+                    <statements_block>
+
+
+// ============================================================
+// CONNECTIONS BLOCK
+// ============================================================
+
+<connections_block> ::= <connection_pipe>
+
+<connection_pipe> ::= <connection> <connection_pipe>
+                    | <connection>
+
+<connection> ::= <connection_type>
+                 <optional_spaces>
+                 <connection_name>
+                 <optional_spaces>
+                 <connection_string>
+                 <semicolon>
+
+<connection_type> ::= sqlite
+                    | csv
+
+<connection_name> ::= <identifier>
+
+<connection_string> ::= <string>
+
+
+// ============================================================
+// STATEMENTS BLOCK
+// ============================================================
+
+<statements_block> ::= <statement_pipe>
+                     | <empty>
+
+<statement_pipe> ::= <statement> <statement_pipe>
+                   | <statement>
+
+<statement> ::= <function>
+              | <command>
+
+
+// ============================================================
+// FUNCTIONS
+// ============================================================
+
+<function> ::= <function_name>
+               "("
+               <function_params>
+               ")"
+               "{"
+               <function_command_pipe>
+               "}"
+
+<function_command_pipe> ::= <function_command> <function_command_pipe>
+                          | <function_command>
+
+<function_command> ::= <command>
+                     | <return_command>
+
+<return_command> ::= return
+                     <optional_spaces>
+                     <value_or_variable>
+                     <semicolon>
+
+<function_name> ::= <identifier>
+
+<function_params> ::= <function_params_pipe>
+                    | <empty>
+
+<function_params_pipe> ::= <function_param>
+                           <semicolon>
+                           <function_params_pipe>
+                         | <function_param>
+
+<function_param> ::= <param_name>
+                   | <param_name>
+                     ":"
+                     <param_type>
+
+<param_name> ::= <identifier>
+
+<param_type> ::= <variable_type>
+
+
+// ============================================================
+// COMMANDS
+// ============================================================
+
+<command> ::= <command_expression> <semicolon>
+
+<command_expression> ::= <assign_expression>
+                       | <filter_expression>
+                       | <output_expression>
+                       | <merge_expression>
+                       | <save_expression>
+                       | <add_rows_expression>
+                       | <add_columns_expression>
+                       | <edit_rows_expression>
+                       | <edit_columns_expression>
+                       | <delete_columns_expression>
+                       | <delete_rows_expression>
+                       | <scan_expression>
+                       | <function_call_expression>
+                       | <find_duplicates_expression>
+
+
+// ============================================================
+// TABLE EXPRESSIONS
+// ============================================================
+
+<database_table_reference> ::= <connection_name>
+                               "."
+                               <table_name>
+
+<table_expression> ::= <table_reference>
+
+                     | <table_reference>
+                       "["
+                       <column_names>
+                       "]"
+
+<table_reference> ::= <table_name>
+                    | <database_table_reference>
+
+<table_name> ::= <identifier>
+
+<column_names> ::= <column_name>
+                   ","
+                   <optional_spaces>
+                   <column_names>
+                 | <column_name>
+
+<column_name> ::= <identifier>
+
+
+// ============================================================
+// ASSIGN EXPRESSION
+// ============================================================
+
+<assign_expression> ::= <variable_name>
+                        <optional_spaces>
+                        <assign_sign>
+                        <optional_spaces>
+                        <command_expression>
+
+
+// ============================================================
+// FILTER EXPRESSION
+// ============================================================
+
+<filter_expression> ::= filter
+                        <optional_spaces>
+                        <table_expression>
+                        <optional_spaces>
+                        where
+                        <optional_spaces>
+                        <filter_condition>
+
+<filter_condition> ::= <compare_filter_condition>
+                     | <starts_with_filter_condition>
+
+<compare_filter_condition> ::= <column_name>
+                               <optional_spaces>
+                               <compare_operator>
+                               <optional_spaces>
+                               <value_or_variable>
+
+<compare_operator> ::= <equal_sign>
+                     | <not_equal_sign>
+                     | <compare_more_sign>
+                     | <compare_less_sign>
+                     | <compare_more_or_equal_sign>
+                     | <compare_less_or_equal_sign>
+
+<starts_with_filter_condition> ::= <column_name>
+                                   <optional_spaces>
+                                   starts_with
+                                   <optional_spaces>
+                                   <string>
+
+
+// ============================================================
+// OUTPUT EXPRESSION
+// ============================================================
+
+<output_expression> ::= <value_or_variable>
+                        <optional_spaces>
+                        "->"
+                        <optional_spaces>
+                        <output_destination>
+
+<output_destination> ::= <console_destination>
+                       | <database_destination>
+                       | <file_destination>
+
+<console_destination> ::= console
+
+<database_destination> ::= database
+                           <optional_spaces>
+                           <connection_name>
+
+<file_destination> ::= file
+                       <optional_spaces>
+                       <string>
+
+
+// ============================================================
+// SAVE EXPRESSION
+// ============================================================
+
+<save_expression> ::= save
+                      <optional_spaces>
+                      <table_expression>
+                      <optional_spaces>
+                      into
+                      <optional_spaces>
+                      <table_name>
+
+                    | save
+                      <optional_spaces>
+                      <table_expression>
+                      <optional_spaces>
+                      into
+                      <optional_spaces>
+                      <table_name>
+                      <optional_spaces>
+                      allowDanger
+
+
+// ============================================================
+// FIND DUPLICATES EXPRESSION
+// ============================================================
+
+<find_duplicates_expression> ::= find_duplicates
+                                 <optional_spaces>
+                                 <table_expression>
+                                 <optional_spaces>
+                                 using
+                                 <optional_spaces>
+                                 tool
+                                 <optional_spaces>
+                                 <duplicate_tool_name>
+                                 <optional_duplicate_tool_params>
+
+<duplicate_tool_name> ::= fuzzy_duplicates
+                        | typo_detector
+                        | levenshtein_matcher
+
+<optional_duplicate_tool_params> ::= <empty>
+                                   | "("
+                                     <duplicate_tool_param_list>
+                                     ")"
+
+<duplicate_tool_param_list> ::= <duplicate_tool_param>
+                              | <duplicate_tool_param>
+                                ","
+                                <optional_spaces>
+                                <duplicate_tool_param_list>
+
+<duplicate_tool_param> ::= <value_or_variable>
+
+
+// ============================================================
+// MERGE EXPRESSION
+// merge is allowed only after duplicate detection
+// ============================================================
+
+<merge_expression> ::= merge
+                       <optional_spaces>
+                       <duplicates_variable>
+
+<duplicates_variable> ::= <identifier>
+
+
+// ============================================================
+// ADD ROWS EXPRESSION
+// ============================================================
+
+<add_rows_expression> ::= add_rows
+                          <optional_spaces>
+                          <table_name>
+                          <optional_spaces>
+                          <row_values>
+
+<row_values> ::= "(" <row_value_list> ")"
+
+<row_value_list> ::= <value_or_variable>
+                     ","
+                     <optional_spaces>
+                     <row_value_list>
+                   | <value_or_variable>
+
+
+// ============================================================
+// ADD COLUMNS EXPRESSION
+// ============================================================
+
+<add_columns_expression> ::= add_columns
+                             <optional_spaces>
+                             <table_name>
+                             <optional_spaces>
+                             <column_definition_list>
+
+<column_definition_list> ::= <column_definition>
+                             ","
+                             <optional_spaces>
+                             <column_definition_list>
+                           | <column_definition>
+
+<column_definition> ::= <column_name>
+                        ":"
+                        <variable_type>
+
+
+// ============================================================
+// EDIT ROWS EXPRESSION
+// ============================================================
+
+<edit_rows_expression> ::= edit_rows
+                           <optional_spaces>
+                           <table_name>
+                           <optional_spaces>
+                           where
+                           <optional_spaces>
+                           <filter_condition>
+                           <optional_spaces>
+                           set
+                           <optional_spaces>
+                           <edit_row_assignments>
+
+<edit_row_assignments> ::= <edit_row_assignment>
+                           ","
+                           <optional_spaces>
+                           <edit_row_assignments>
+                         | <edit_row_assignment>
+
+<edit_row_assignment> ::= <column_name>
+                          <optional_spaces>
+                          <assign_sign>
+                          <optional_spaces>
+                          <value_or_variable>
+
+
+// ============================================================
+// EDIT COLUMNS EXPRESSION
+// ============================================================
+
+<edit_columns_expression> ::= edit_columns
+                              <optional_spaces>
+                              <table_name>
+                              <optional_spaces>
+                              rename
+                              <optional_spaces>
+                              <column_name>
+                              <optional_spaces>
+                              to
+                              <optional_spaces>
+                              <column_name>
+
+
+// ============================================================
+// DELETE COLUMNS EXPRESSION
+// ============================================================
+
+<delete_columns_expression> ::= delete_columns
+                                <optional_spaces>
+                                <table_name>
+                                <optional_spaces>
+                                "["
+                                <column_names>
+                                "]"
+
+
+// ============================================================
+// DELETE ROWS EXPRESSION
+// ============================================================
+
+<delete_rows_expression> ::= delete_rows
+                             <optional_spaces>
+                             <table_name>
+                             <optional_spaces>
+                             where
+                             <optional_spaces>
+                             <filter_condition>
+
+
+// ============================================================
+// SCAN EXPRESSION
+// ============================================================
+
+<scan_expression> ::= scan
+                      <optional_spaces>
+                      <table_expression>
+
+                    | scan
+                      <optional_spaces>
+                      <table_expression>
+                      <optional_spaces>
+                      using_tool
+                      <optional_spaces>
+                      <tool_name>
+                      <optional_tool_params>
+
+<tool_name> ::= row_counter
+              | name_counter
+              | fuzzy_duplicates
+              | typo_detector
+
+<optional_tool_params> ::= <empty>
+                         | "("
+                           <tool_param_list>
+                           ")"
+
+<tool_param_list> ::= <tool_param>
+                      ","
+                      <optional_spaces>
+                      <tool_param_list>
+                    | <tool_param>
+
+<tool_param> ::= <value_or_variable>
+
+
+// ============================================================
+// FUNCTION CALL EXPRESSION
+// ============================================================
+
+<function_call_expression> ::= <function_name>
+                               "("
+                               <optional_function_call_params>
+                               ")"
+
+<optional_function_call_params> ::= <empty>
+                                  | <function_call_params>
+
+<function_call_params> ::= <function_call_param>
+                           ","
+                           <optional_spaces>
+                           <function_call_params>
+                         | <function_call_param>
+
+<function_call_param> ::= <value_or_variable>

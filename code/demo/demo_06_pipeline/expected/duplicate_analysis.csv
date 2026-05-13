@@ -1,0 +1,5 @@
+id,name,email,age,typo_suspect,typo_suggestion,typo_distance,duplicate_group_id,similarity_score,canonical_candidate,matched_with
+1,Alice Johnson,alice@example.com,31,False,,,dup-1,1.0,True,
+2,Alic Johnson,alice@example.con,31,True,alice@example.com,1,dup-1,0.923,False,alice johnson
+4,Carla Smith,carla@gmial.com,24,True,carla@gmail.com,2,dup-2,1.0,False,carla smith
+5,Carla Smith,carla@gmail.com,24,False,,,dup-2,1.0,True,

@@ -1,0 +1,7 @@
+[project]
+name = "daquva"
+version = "0.1.0"
+description = "DaQuVa: a lazy logical-plan DSL for data query validation"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = []

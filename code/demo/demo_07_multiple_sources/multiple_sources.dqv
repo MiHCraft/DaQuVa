@@ -1,0 +1,15 @@
+csv customers "input/customers.csv";
+sqlite ordersdb "input/orders.sqlite";
+sqlite out "output/multiple_sources.sqlite";
+
+customers_raw = scan customers.customers;
+moldova_customers = filter customers_raw where country == "MD";
+
+orders_raw = scan ordersdb.orders;
+large_orders = filter orders_raw where amount >= 100;
+
+moldova_customers -> file "output/moldova_customers.csv";
+large_orders -> file "output/large_orders.csv";
+save moldova_customers into moldova_customers allowDanger;
+save large_orders into large_orders allowDanger;
+

@@ -1,0 +1,6 @@
+id,name,email,age,duplicate_group_id,similarity_score,canonical_candidate,matched_with
+1,Alice Johnson,alice@example.com,31,dup-1,1.0,True,
+2,Alic Johnson,alice.alt@example.com,31,dup-1,0.923,False,alice johnson
+3,Bob Stone,bob@example.com,28,dup-2,1.0,True,
+4,bob stone,bob.work@example.com,28,dup-2,1.0,False,bob stone
+5,Carla Smith,carla@example.com,40,,1.0,True,

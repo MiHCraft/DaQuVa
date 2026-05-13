@@ -1,0 +1,10 @@
+csv people "input/people.csv";
+sqlite out "output/duplicates.sqlite";
+
+people = scan people.people;
+dupes = find_duplicates people[name] using tool fuzzy_duplicates(2);
+merged = merge dupes;
+
+dupes -> file "output/duplicate_analysis.csv";
+merged -> file "output/merged_people.csv";
+save merged into merged_people allowDanger;
