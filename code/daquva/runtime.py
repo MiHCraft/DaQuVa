@@ -16,11 +16,14 @@ from daquva.ast_nodes import (
     EditRowsExpression,
     FilterExpression,
     FindDuplicatesExpression,
+    FunctionCall,
+    FunctionDefinition,
     Literal,
     MergeExpression,
     OutputStatement,
     Program,
     RenameColumnExpression,
+    ReturnStatement,
     SaveStatement,
     ScanExpression,
     TableReference,
@@ -41,6 +44,7 @@ class Runtime:
         self.base_path = Path(base_path or ".").resolve()
         self.connections: dict[str, CSVConnection | SQLiteConnection] = {}
         self.memory: dict[str, Any] = {}
+        self.functions: dict[str, FunctionDefinition] = {}
         self.engine = ExecutionEngine(self.connections)
 
     def run(self, program: Program) -> None:
@@ -64,6 +68,9 @@ class Runtime:
         if isinstance(statement, Assignment):
             self.memory[statement.target] = self._evaluate(statement.expression)
             return
+        if isinstance(statement, FunctionDefinition):
+            self.functions[statement.name] = statement
+            return
 
         if isinstance(statement, OutputStatement):
             self._execute_output(statement)
@@ -78,6 +85,8 @@ class Runtime:
     def _evaluate(self, expression: object) -> Any:
         if isinstance(expression, Literal):
             return expression.value
+        if isinstance(expression, FunctionCall):
+            return self._call_function(expression)
 
         if isinstance(expression, VariableReference):
             if expression.name not in self.memory:
@@ -133,6 +142,31 @@ class Runtime:
             return table.delete_rows(self._resolve_condition(expression.condition))
 
         raise TypeError(f"Unsupported AST node: {type(expression).__name__}")
+
+    def _call_function(self, call: FunctionCall) -> Any:
+        definition = self.functions.get(call.name)
+        if definition is None:
+            raise ValueError(f"Unknown function {call.name!r}")
+        if len(definition.params) != len(call.args):
+            raise ValueError(
+                f"Function {call.name!r} expects {len(definition.params)} args, got {len(call.args)}"
+            )
+
+        arg_values = [self._resolve_value(arg) for arg in call.args]
+        previous_memory = self.memory
+        local_memory = dict(previous_memory)
+        for param, value in zip(definition.params, arg_values, strict=True):
+            local_memory[param] = value
+        self.memory = local_memory
+        try:
+            for statement in definition.body:
+                if isinstance(statement, ReturnStatement):
+                    return self._resolve_value(statement.value)
+                self._execute_statement(statement)
+        finally:
+            self.memory = previous_memory
+
+        raise ValueError(f"Function {call.name!r} did not return a value")
 
     def _execute_output(self, statement: OutputStatement) -> None:
         value = self._resolve_value(statement.value)

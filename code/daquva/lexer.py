@@ -23,6 +23,8 @@ class TokenType(Enum):
     DOT = auto()
     LPAREN = auto()
     RPAREN = auto()
+    LBRACE = auto()
+    RBRACE = auto()
     LBRACKET = auto()
     RBRACKET = auto()
     STRING = auto()
@@ -61,6 +63,7 @@ class TokenType(Enum):
     STRING_TYPE = auto()
     BOOL_TYPE = auto()
     TABLE_TYPE = auto()
+    RETURN = auto()
     EOF = auto()
 
 
@@ -92,6 +95,7 @@ KEYWORDS = {
     "rename": TokenType.RENAME,
     "to": TokenType.TO,
     "set": TokenType.SET,
+    "return": TokenType.RETURN,
     "true": TokenType.TRUE,
     "false": TokenType.FALSE,
     "number": TokenType.NUMBER_TYPE,
@@ -118,6 +122,8 @@ TOKEN_SPEC = [
     ("DOT", r"\."),
     ("LPAREN", r"\("),
     ("RPAREN", r"\)"),
+    ("LBRACE", r"\{"),
+    ("RBRACE", r"\}"),
     ("LBRACKET", r"\["),
     ("RBRACKET", r"\]"),
     ("STRING", r'"(?:[^"\\]|\\.)*"'),

@@ -17,12 +17,15 @@ from daquva.ast_nodes import (
     EditRowsExpression,
     FilterExpression,
     FindDuplicatesExpression,
+    FunctionCall,
+    FunctionDefinition,
     Literal,
     MergeExpression,
     OutputDestination,
     OutputStatement,
     Program,
     RenameColumnExpression,
+    ReturnStatement,
     SaveStatement,
     ScanExpression,
     TableReference,
@@ -60,6 +63,9 @@ class Parser:
         return ConnectionDecl(str(kind_token.value), str(name), str(path))
 
     def _statement(self) -> object:
+        if self._looks_like_function_definition():
+            return self._function_definition()
+
         if self._peek().type == TokenType.OUTPUT:
             self._advance()
             return self._output_expression()
@@ -70,6 +76,28 @@ class Parser:
             return Assignment(target, self._command_expression())
 
         return self._command_expression()
+
+    def _looks_like_function_definition(self) -> bool:
+        if not (
+            self._peek().type == TokenType.IDENTIFIER
+            and self._peek_next().type == TokenType.LPAREN
+        ):
+            return False
+        cursor = self.index + 2
+        depth = 1
+        while cursor < len(self.tokens):
+            token_type = self.tokens[cursor].type
+            if token_type == TokenType.LPAREN:
+                depth += 1
+            elif token_type == TokenType.RPAREN:
+                depth -= 1
+                if depth == 0:
+                    return (
+                        cursor + 1 < len(self.tokens)
+                        and self.tokens[cursor + 1].type == TokenType.LBRACE
+                    )
+            cursor += 1
+        return False
 
     def _command_expression(self) -> object:
         token_type = self._peek().type
@@ -104,6 +132,8 @@ class Parser:
             TokenType.TRUE,
             TokenType.FALSE,
         }:
+            if token_type == TokenType.IDENTIFIER and self._peek_next().type == TokenType.LPAREN:
+                return self._function_call()
             value = self._value_or_variable()
             if self._peek().type == TokenType.ARROW:
                 return self._output_expression(value)
@@ -234,6 +264,33 @@ class Parser:
             self._raise("Expected output destination: console, file, or database")
 
         return OutputStatement(value, destination)
+
+    def _function_definition(self) -> FunctionDefinition:
+        name = str(self._expect(TokenType.IDENTIFIER).value)
+        self._expect(TokenType.LPAREN)
+        params = self._identifier_list_until(TokenType.RPAREN)
+        self._expect(TokenType.RPAREN)
+        self._expect(TokenType.LBRACE)
+
+        body: list[object] = []
+        while self._peek().type != TokenType.RBRACE:
+            if self._match(TokenType.SEMICOLON):
+                continue
+            if self._match(TokenType.RETURN):
+                body.append(ReturnStatement(self._value_or_variable()))
+            else:
+                body.append(self._statement())
+            self._expect(TokenType.SEMICOLON)
+
+        self._expect(TokenType.RBRACE)
+        return FunctionDefinition(name, params, tuple(body))
+
+    def _function_call(self) -> FunctionCall:
+        name = str(self._expect(TokenType.IDENTIFIER).value)
+        self._expect(TokenType.LPAREN)
+        args = self._value_list_until(TokenType.RPAREN)
+        self._expect(TokenType.RPAREN)
+        return FunctionCall(name, args)
 
     def _table_reference(self) -> TableReference:
         first = str(self._expect(TokenType.IDENTIFIER).value)

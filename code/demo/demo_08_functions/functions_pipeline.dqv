@@ -1,0 +1,13 @@
+csv people "input/people.csv";
+sqlite out "output/functions.sqlite";
+
+make_adults(source_table, min_age) {
+    adults = filter source_table where age >= min_age;
+    return adults;
+};
+
+raw = scan people.people using_tool row_counter;
+adult_rows = make_adults(raw, 18);
+
+adult_rows -> file "output/adults_via_function.csv";
+save adult_rows into adults_via_function allowDanger;

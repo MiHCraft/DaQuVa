@@ -149,3 +149,21 @@ class SaveStatement:
     source: TableReference
     table_name: str
     allow_danger: bool = False
+
+
+@dataclass(frozen=True)
+class FunctionDefinition:
+    name: str
+    params: tuple[str, ...]
+    body: tuple[Any, ...]
+
+
+@dataclass(frozen=True)
+class FunctionCall:
+    name: str
+    args: tuple[ValueNode, ...]
+
+
+@dataclass(frozen=True)
+class ReturnStatement:
+    value: ValueNode
