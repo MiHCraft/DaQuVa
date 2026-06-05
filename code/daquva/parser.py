@@ -11,6 +11,7 @@ from daquva.ast_nodes import (
     AddRowsExpression,
     Assignment,
     Condition,
+    CompoundCondition,
     ConnectionDecl,
     DeleteColumnsExpression,
     DeleteRowsExpression,
@@ -259,7 +260,9 @@ class Parser:
         elif self._match(TokenType.FILE):
             destination = OutputDestination("file", str(self._expect(TokenType.STRING).value))
         elif self._match(TokenType.DATABASE):
-            destination = OutputDestination("database", str(self._expect(TokenType.IDENTIFIER).value))
+            conn_name = str(self._expect(TokenType.IDENTIFIER).value)
+            allow_danger = self._match(TokenType.ALLOW_DANGER)
+            destination = OutputDestination("database", conn_name, allow_danger)
         else:
             self._raise("Expected output destination: console, file, or database")
 
@@ -277,7 +280,13 @@ class Parser:
             if self._match(TokenType.SEMICOLON):
                 continue
             if self._match(TokenType.RETURN):
-                body.append(ReturnStatement(self._value_or_variable()))
+                if (
+                    self._peek().type == TokenType.IDENTIFIER
+                    and self._peek_next().type == TokenType.LPAREN
+                ):
+                    body.append(ReturnStatement(self._function_call()))
+                else:
+                    body.append(ReturnStatement(self._value_or_variable()))
             else:
                 body.append(self._statement())
             self._expect(TokenType.SEMICOLON)
@@ -308,7 +317,26 @@ class Parser:
 
         return TableReference(name=name, connection=connection, columns=columns)
 
-    def _condition(self) -> Condition:
+    def _condition(self) -> Condition | CompoundCondition:
+        return self._or_condition()
+
+    def _or_condition(self) -> Condition | CompoundCondition:
+        left = self._and_condition()
+        while self._peek().type == TokenType.OR:
+            self._advance()
+            right = self._and_condition()
+            left = CompoundCondition(left, "OR", right)
+        return left
+
+    def _and_condition(self) -> Condition | CompoundCondition:
+        left = self._simple_condition()
+        while self._peek().type == TokenType.AND:
+            self._advance()
+            right = self._simple_condition()
+            left = CompoundCondition(left, "AND", right)
+        return left
+
+    def _simple_condition(self) -> Condition:
         column = str(self._expect(TokenType.IDENTIFIER).value)
 
         if self._match(TokenType.STARTS_WITH):

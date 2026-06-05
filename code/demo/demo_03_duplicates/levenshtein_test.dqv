@@ -1,0 +1,5 @@
+csv people "input/people.csv";
+
+people = scan people.people;
+dupes = find_duplicates people[name] using tool levenshtein_matcher(2);
+dupes -> console;

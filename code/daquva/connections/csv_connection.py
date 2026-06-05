@@ -51,4 +51,4 @@ def _parse_cell(value: str) -> Any:
             return int(text)
         return float(text)
     except ValueError:
-        return value
+        return text

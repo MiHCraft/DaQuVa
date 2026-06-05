@@ -58,6 +58,16 @@ class Condition:
 
 
 @dataclass(frozen=True)
+class CompoundCondition:
+    left: Any  # Condition | CompoundCondition
+    operator: str  # "AND" or "OR"
+    right: Any  # Condition | CompoundCondition
+
+
+FilterCondition = Any  # Condition | CompoundCondition
+
+
+@dataclass(frozen=True)
 class Program:
     connections: tuple[ConnectionDecl, ...]
     statements: tuple[Any, ...]
@@ -136,6 +146,7 @@ class DeleteRowsExpression:
 class OutputDestination:
     kind: str
     target: str | None = None
+    allow_danger: bool = False
 
 
 @dataclass(frozen=True)

@@ -58,27 +58,38 @@ class SQLiteConnection:
         rows: list[dict[str, Any]],
         allow_danger: bool,
     ) -> None:
-        if self.table_exists(table_name):
-            if not allow_danger:
-                raise ValueError(
-                    f"Refusing to overwrite existing SQLite table {table_name!r}. "
-                    "Use allowDanger if this destructive overwrite is intended."
-                )
-            self.connection.execute(f"DROP TABLE {_quote_identifier(table_name)}")
+        if self.table_exists(table_name) and not allow_danger:
+            raise ValueError(
+                f"Refusing to overwrite existing SQLite table {table_name!r}. "
+                "Use allowDanger if this destructive overwrite is intended."
+            )
 
         if not columns:
             raise ValueError("Cannot save an empty table without schema information")
 
+        # Build the new table under a temporary name first so the original is
+        # untouched if anything fails before the final rename.
+        temp_name = f"_daquva_new_{table_name}"
+        if self.table_exists(temp_name):
+            self.connection.execute(f"DROP TABLE {_quote_identifier(temp_name)}")
+
         column_defs = ", ".join(
             f"{_quote_identifier(column)} {_sqlite_type_for_column(rows, column)}" for column in columns
         )
-        self.connection.execute(f"CREATE TABLE {_quote_identifier(table_name)} ({column_defs})")
+        self.connection.execute(f"CREATE TABLE {_quote_identifier(temp_name)} ({column_defs})")
 
         placeholders = ", ".join("?" for _ in columns)
         quoted_columns = ", ".join(_quote_identifier(column) for column in columns)
-        sql = f"INSERT INTO {_quote_identifier(table_name)} ({quoted_columns}) VALUES ({placeholders})"
+        sql = f"INSERT INTO {_quote_identifier(temp_name)} ({quoted_columns}) VALUES ({placeholders})"
         values = [tuple(row.get(column) for column in columns) for row in rows]
         self.connection.executemany(sql, values)
+
+        # All data is safely written to temp_name; now do the atomic swap.
+        if self.table_exists(table_name):
+            self.connection.execute(f"DROP TABLE {_quote_identifier(table_name)}")
+        self.connection.execute(
+            f"ALTER TABLE {_quote_identifier(temp_name)} RENAME TO {_quote_identifier(table_name)}"
+        )
         self.connection.commit()
 def _sqlite_type_for_column(rows: list[dict[str, Any]], column: str) -> str:
     values = [row.get(column) for row in rows if row.get(column) not in (None, "")]

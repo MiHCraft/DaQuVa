@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-from daquva.ast_nodes import Condition, Literal
+from daquva.ast_nodes import Condition, CompoundCondition, Literal
 from daquva.connections.csv_connection import CSVConnection
 from daquva.connections.sqlite_connection import SQLiteConnection
 from daquva.table import (
@@ -79,6 +79,8 @@ class ExecutionEngine:
         if isinstance(plan, DuplicateDetectionPlan):
             rows = self._execute(plan.source)
             threshold = _first_int_param(plan.params, default=2)
+            if plan.tool not in {"fuzzy_duplicates", "levenshtein_matcher"}:
+                raise ValueError(f"Unknown duplicate tool {plan.tool!r}")
             return annotate_duplicates(rows, plan.columns, max_distance=threshold)
 
         if isinstance(plan, MergePlan):
@@ -199,28 +201,53 @@ class ExecutionEngine:
         return query.connection.execute_query(sql, query.params)
 
 
-def _matches(row: dict[str, Any], condition: Condition) -> bool:
-    left = row.get(condition.column)
+def _matches(row: dict[str, Any], condition: Condition | CompoundCondition) -> bool:
+    if isinstance(condition, CompoundCondition):
+        left_result = _matches(row, condition.left)
+        if condition.operator == "AND":
+            return left_result and _matches(row, condition.right)
+        if condition.operator == "OR":
+            return left_result or _matches(row, condition.right)
+        raise ValueError(f"Unknown logical operator {condition.operator!r}")
+
+    if condition.column not in row:
+        available = ", ".join(sorted(row.keys()))
+        raise ValueError(
+            f"Condition references column {condition.column!r} which does not exist. "
+            f"Available columns: {available}"
+        )
+    left = row[condition.column]
     right = _literal_value(condition.value)
 
     if condition.operator == "starts_with":
-        return str(left or "").startswith(str(right))
+        return (str(left) if left is not None else "").startswith(str(right))
     if condition.operator == "==":
         return _comparable(left) == _comparable(right)
     if condition.operator == "!=":
         return _comparable(left) != _comparable(right)
-    if condition.operator == ">":
-        return _comparable(left) > _comparable(right)
-    if condition.operator == "<":
-        return _comparable(left) < _comparable(right)
-    if condition.operator == ">=":
-        return _comparable(left) >= _comparable(right)
-    if condition.operator == "<=":
-        return _comparable(left) <= _comparable(right)
+    try:
+        if condition.operator == ">":
+            return _comparable(left) > _comparable(right)
+        if condition.operator == "<":
+            return _comparable(left) < _comparable(right)
+        if condition.operator == ">=":
+            return _comparable(left) >= _comparable(right)
+        if condition.operator == "<=":
+            return _comparable(left) <= _comparable(right)
+    except TypeError:
+        raise ValueError(
+            f"Cannot compare column {condition.column!r} (value {left!r}, type {type(left).__name__}) "
+            f"with {right!r} ({type(right).__name__}) using {condition.operator!r}"
+        )
     raise ValueError(f"Unknown filter operator {condition.operator!r}")
 
 
-def _sql_condition(condition: Condition) -> tuple[str, tuple[Any, ...]]:
+def _sql_condition(condition: Condition | CompoundCondition) -> tuple[str, tuple[Any, ...]]:
+    if isinstance(condition, CompoundCondition):
+        left_sql, left_params = _sql_condition(condition.left)
+        right_sql, right_params = _sql_condition(condition.right)
+        return f"({left_sql} {condition.operator} {right_sql})", left_params + right_params
+
     value = _literal_value(condition.value)
     column = _quote_identifier(condition.column)
     if condition.operator == "starts_with":

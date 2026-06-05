@@ -139,11 +139,13 @@ def _is_duplicate_key(left: str, right: str, max_distance: int) -> bool:
         return False
     if left == right:
         return True
+    # Length difference alone can only increase edit distance, never decrease it.
+    # If the lengths differ by more than max_distance, no edit sequence of that
+    # length can make them equal — skip the O(|L|·|R|) Levenshtein call.
+    if abs(len(left) - len(right)) > max_distance:
+        return False
     distance = levenshtein(left, right)
-    if distance <= max_distance:
-        return True
-    shorter, longer = sorted((left, right), key=len)
-    return longer.startswith(shorter) and len(longer) - len(shorter) <= max_distance
+    return distance <= max_distance
 
 
 def _similarity(left: str, right: str) -> float:

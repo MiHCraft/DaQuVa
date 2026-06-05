@@ -10,6 +10,7 @@ from daquva.ast_nodes import (
     AddRowsExpression,
     Assignment,
     Condition,
+    CompoundCondition,
     ConnectionDecl,
     DeleteColumnsExpression,
     DeleteRowsExpression,
@@ -161,7 +162,7 @@ class Runtime:
         try:
             for statement in definition.body:
                 if isinstance(statement, ReturnStatement):
-                    return self._resolve_value(statement.value)
+                    return self._evaluate(statement.value)
                 self._execute_statement(statement)
         finally:
             self.memory = previous_memory
@@ -195,7 +196,7 @@ class Runtime:
                 raise ValueError("Database output requires a connection name")
             connection = self._sqlite_connection(destination.target)
             table_name = self._output_table_name(statement.value)
-            write_sqlite(connection, table_name, materialized.columns, materialized.rows, allow_danger=True)
+            write_sqlite(connection, table_name, materialized.columns, materialized.rows, destination.allow_danger)
             return
 
         raise ValueError(f"Unknown output destination {destination.kind!r}")
@@ -239,7 +240,13 @@ class Runtime:
             raise ValueError(f"Unknown table variable {name!r}")
         return value
 
-    def _resolve_condition(self, condition: Condition) -> Condition:
+    def _resolve_condition(self, condition: Condition | CompoundCondition) -> Condition | CompoundCondition:
+        if isinstance(condition, CompoundCondition):
+            return CompoundCondition(
+                self._resolve_condition(condition.left),
+                condition.operator,
+                self._resolve_condition(condition.right),
+            )
         return Condition(condition.column, condition.operator, Literal(self._resolve_value(condition.value)))
 
     def _resolve_values(self, values: tuple[ValueNode, ...]) -> tuple[Any, ...]:

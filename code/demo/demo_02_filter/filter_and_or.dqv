@@ -1,0 +1,12 @@
+csv people "input/people.csv";
+
+people = scan people.people;
+
+// AND: adults named "Alice" or "Bob"
+adults_named = filter people where age >= 18 AND name starts_with "A";
+
+// OR: either young (<18) or old (>=60)
+extremes = filter people where age < 18 OR age >= 60;
+
+adults_named -> console;
+extremes -> console;

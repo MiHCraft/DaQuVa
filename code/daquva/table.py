@@ -9,7 +9,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field, replace
 from typing import Any
 
-from daquva.ast_nodes import Condition
+from daquva.ast_nodes import Condition, CompoundCondition, FilterCondition
 
 
 DUPLICATE_METADATA_COLUMNS = (
@@ -39,7 +39,7 @@ class ProjectPlan:
 @dataclass(frozen=True)
 class FilterPlan:
     source: "LogicalPlan"
-    condition: Condition
+    condition: FilterCondition
 
 
 @dataclass(frozen=True)
@@ -79,7 +79,7 @@ class AddColumnsPlan:
 @dataclass(frozen=True)
 class EditRowsPlan:
     source: "LogicalPlan"
-    condition: Condition
+    condition: FilterCondition
     assignments: tuple[tuple[str, Any], ...]
 
 
@@ -99,7 +99,7 @@ class DeleteColumnsPlan:
 @dataclass(frozen=True)
 class DeleteRowsPlan:
     source: "LogicalPlan"
-    condition: Condition
+    condition: FilterCondition
 
 
 LogicalPlan = (
@@ -134,7 +134,7 @@ class Table:
         self._require_columns(columns)
         return Table(ProjectPlan(self.plan, columns), columns, (), self.kind, dict(self.analysis))
 
-    def filter(self, condition: Condition) -> "Table":
+    def filter(self, condition: FilterCondition) -> "Table":
         return replace(self, plan=FilterPlan(self.plan, condition))
 
     def with_tool(self, tool: str, params: tuple[Any, ...]) -> "Table":
@@ -195,7 +195,7 @@ class Table:
             dict(self.analysis),
         )
 
-    def edit_rows(self, condition: Condition, assignments: tuple[tuple[str, Any], ...]) -> "Table":
+    def edit_rows(self, condition: FilterCondition, assignments: tuple[tuple[str, Any], ...]) -> "Table":
         assignment_columns = tuple(column for column, _ in assignments)
         self._require_columns(assignment_columns)
         return replace(self, plan=EditRowsPlan(self.plan, condition, assignments))
@@ -212,7 +212,7 @@ class Table:
         metadata = tuple(column for column in self.metadata_columns if column not in columns)
         return Table(DeleteColumnsPlan(self.plan, columns), schema, metadata, self.kind, dict(self.analysis))
 
-    def delete_rows(self, condition: Condition) -> "Table":
+    def delete_rows(self, condition: FilterCondition) -> "Table":
         return replace(self, plan=DeleteRowsPlan(self.plan, condition))
 
     def _require_columns(self, columns: tuple[str, ...]) -> None:

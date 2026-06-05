@@ -313,8 +313,12 @@
                         <optional_spaces>
                         <filter_condition>
 
-<filter_condition> ::= <compare_filter_condition>
-                     | <starts_with_filter_condition>
+<filter_condition> ::= <simple_filter_condition>
+                     | <simple_filter_condition> AND <filter_condition>
+                     | <simple_filter_condition> OR <filter_condition>
+
+<simple_filter_condition> ::= <compare_filter_condition>
+                            | <starts_with_filter_condition>
 
 <compare_filter_condition> ::= <column_name>
                                <optional_spaces>

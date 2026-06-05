@@ -64,6 +64,8 @@ class TokenType(Enum):
     BOOL_TYPE = auto()
     TABLE_TYPE = auto()
     RETURN = auto()
+    AND = auto()
+    OR = auto()
     EOF = auto()
 
 
@@ -96,6 +98,8 @@ KEYWORDS = {
     "to": TokenType.TO,
     "set": TokenType.SET,
     "return": TokenType.RETURN,
+    "AND": TokenType.AND,
+    "OR": TokenType.OR,
     "true": TokenType.TRUE,
     "false": TokenType.FALSE,
     "number": TokenType.NUMBER_TYPE,
