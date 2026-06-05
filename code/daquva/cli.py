@@ -23,11 +23,17 @@ def run_file(path: Path, *, print_tokens: bool = False, print_ast: bool = False)
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Run a DaQuVa .dqv program")
-    parser.add_argument("source", type=Path, help="Path to a .dqv file")
+    parser = argparse.ArgumentParser(description="DaQuVa — Data Quality Validator")
+    parser.add_argument("source", type=Path, nargs="?", help="Path to a .dqv file (omit for REPL)")
     parser.add_argument("--tokens", action="store_true", help="Print lexer tokens before execution")
     parser.add_argument("--ast", action="store_true", help="Print parsed AST before execution")
+    parser.add_argument("--repl", "-i", action="store_true", help="Start interactive REPL")
     args = parser.parse_args()
+
+    if args.repl or args.source is None:
+        from daquva.repl import run_repl
+        run_repl()
+        return
 
     run_file(args.source.resolve(), print_tokens=args.tokens, print_ast=args.ast)
 

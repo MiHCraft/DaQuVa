@@ -1,0 +1,11 @@
+id,name,email,age,city,plan
+1,Alice Johnson,alice@gmail.com,31,Berlin,premium
+2,Alic Johnson,alice@gmial.com,31,Berlin,premium
+3,Bob Stone,bob@outlook.com,17,Paris,free
+4,Carla Smith,carla@gmail.com,28,Berlin,basic
+5,Carla Smyth,carla.s@gmail.com,28,Berlin,basic
+6,David Lee,david@company.org,45,London,premium
+7,Eva Mueller, eva@yahoo.com ,33,Vienna,basic
+8,Frank Doe,frank@,22,Madrid,free
+9,George King,george@gmail.com,19,Madrid,free
+10,Hannah Brown,hannah@gmail.com,52,London,premium

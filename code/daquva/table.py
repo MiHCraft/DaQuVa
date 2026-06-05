@@ -102,6 +102,19 @@ class DeleteRowsPlan:
     condition: FilterCondition
 
 
+@dataclass(frozen=True)
+class SortPlan:
+    source: "LogicalPlan"
+    column: str
+    ascending: bool = True
+
+
+@dataclass(frozen=True)
+class LimitPlan:
+    source: "LogicalPlan"
+    count: int
+
+
 LogicalPlan = (
     SourcePlan
     | ProjectPlan
@@ -115,6 +128,8 @@ LogicalPlan = (
     | RenameColumnPlan
     | DeleteColumnsPlan
     | DeleteRowsPlan
+    | SortPlan
+    | LimitPlan
 )
 
 
@@ -214,6 +229,13 @@ class Table:
 
     def delete_rows(self, condition: FilterCondition) -> "Table":
         return replace(self, plan=DeleteRowsPlan(self.plan, condition))
+
+    def sort(self, column: str, ascending: bool = True) -> "Table":
+        self._require_columns((column,))
+        return replace(self, plan=SortPlan(self.plan, column, ascending))
+
+    def limit(self, count: int) -> "Table":
+        return replace(self, plan=LimitPlan(self.plan, count))
 
     def _require_columns(self, columns: tuple[str, ...]) -> None:
         missing = [column for column in columns if column not in self.columns]

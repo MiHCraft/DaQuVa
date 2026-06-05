@@ -1,0 +1,8 @@
+id,name,email,age,city,plan,typo_suspect,typo_suggestion,typo_distance,duplicate_group_id,similarity_score,canonical_candidate,matched_with
+1,Alice Johnson,alice@gmail.com,31,Berlin,premium,False,,,dup-1,1.0,True,
+2,Alic Johnson,alice@gmial.com,31,Berlin,premium,True,alice@gmail.com,2,dup-1,0.923,False,alice johnson
+4,Carla Smith,carla@gmail.com,28,Berlin,basic,False,,,dup-2,1.0,True,
+5,Carla Smyth,carla.s@gmail.com,28,Berlin,basic,False,,,dup-2,0.909,False,carla smith
+6,David Lee,david@company.org,45,London,premium,False,,,,1.0,True,
+7,Eva Mueller,eva@yahoo.com,33,Vienna,basic,False,,,,1.0,True,
+10,Hannah Brown,hannah@gmail.com,52,London,premium,False,,,,1.0,True,

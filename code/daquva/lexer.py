@@ -39,6 +39,8 @@ class TokenType(Enum):
     FILTER = auto()
     WHERE = auto()
     STARTS_WITH = auto()
+    ENDS_WITH = auto()
+    CONTAINS = auto()
     OUTPUT = auto()
     CONSOLE = auto()
     DATABASE = auto()
@@ -64,6 +66,11 @@ class TokenType(Enum):
     BOOL_TYPE = auto()
     TABLE_TYPE = auto()
     RETURN = auto()
+    SORT = auto()
+    BY = auto()
+    ASC = auto()
+    DESC = auto()
+    LIMIT = auto()
     AND = auto()
     OR = auto()
     EOF = auto()
@@ -79,6 +86,8 @@ KEYWORDS = {
     "filter": TokenType.FILTER,
     "where": TokenType.WHERE,
     "starts_with": TokenType.STARTS_WITH,
+    "ends_with": TokenType.ENDS_WITH,
+    "contains": TokenType.CONTAINS,
     "output": TokenType.OUTPUT,
     "console": TokenType.CONSOLE,
     "database": TokenType.DATABASE,
@@ -98,6 +107,11 @@ KEYWORDS = {
     "to": TokenType.TO,
     "set": TokenType.SET,
     "return": TokenType.RETURN,
+    "sort": TokenType.SORT,
+    "by": TokenType.BY,
+    "asc": TokenType.ASC,
+    "desc": TokenType.DESC,
+    "limit": TokenType.LIMIT,
     "AND": TokenType.AND,
     "OR": TokenType.OR,
     "true": TokenType.TRUE,

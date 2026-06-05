@@ -16,10 +16,12 @@ from daquva.table import (
     DuplicateDetectionPlan,
     EditRowsPlan,
     FilterPlan,
+    LimitPlan,
     LogicalPlan,
     MergePlan,
     ProjectPlan,
     RenameColumnPlan,
+    SortPlan,
     SourcePlan,
     Table,
     ToolPlan,
@@ -41,6 +43,9 @@ class _SQLQuery:
     columns: tuple[str, ...]
     conditions: tuple[str, ...]
     params: tuple[Any, ...]
+    order_by: str | None = None
+    order_desc: bool = False
+    limit: int | None = None
 
 
 class ExecutionEngine:
@@ -129,6 +134,14 @@ class ExecutionEngine:
             rows = self._execute(plan.source)
             return [row for row in rows if not _matches(row, plan.condition)]
 
+        if isinstance(plan, SortPlan):
+            rows = self._execute(plan.source)
+            return sorted(rows, key=lambda r: _sort_key(r.get(plan.column)), reverse=not plan.ascending)
+
+        if isinstance(plan, LimitPlan):
+            rows = self._execute(plan.source)
+            return rows[:plan.count]
+
         raise TypeError(f"Unsupported logical plan: {type(plan).__name__}")
 
     def _execute_tool(self, plan: ToolPlan) -> list[dict[str, Any]]:
@@ -174,6 +187,9 @@ class ExecutionEngine:
                 plan.columns,
                 compiled.conditions,
                 compiled.params,
+                compiled.order_by,
+                compiled.order_desc,
+                compiled.limit,
             )
 
         if isinstance(plan, FilterPlan):
@@ -187,6 +203,39 @@ class ExecutionEngine:
                 compiled.columns,
                 compiled.conditions + (condition_sql,),
                 compiled.params + params,
+                compiled.order_by,
+                compiled.order_desc,
+                compiled.limit,
+            )
+
+        if isinstance(plan, SortPlan):
+            compiled = self._compile_sql(plan.source)
+            if compiled is None:
+                return None
+            return _SQLQuery(
+                compiled.connection,
+                compiled.table_name,
+                compiled.columns,
+                compiled.conditions,
+                compiled.params,
+                plan.column,
+                not plan.ascending,
+                compiled.limit,
+            )
+
+        if isinstance(plan, LimitPlan):
+            compiled = self._compile_sql(plan.source)
+            if compiled is None:
+                return None
+            return _SQLQuery(
+                compiled.connection,
+                compiled.table_name,
+                compiled.columns,
+                compiled.conditions,
+                compiled.params,
+                compiled.order_by,
+                compiled.order_desc,
+                plan.count,
             )
 
         return None
@@ -198,6 +247,11 @@ class ExecutionEngine:
         sql = f"SELECT {selected_columns} FROM {_quote_identifier(query.table_name)}"
         if query.conditions:
             sql += " WHERE " + " AND ".join(query.conditions)
+        if query.order_by:
+            direction = "DESC" if query.order_desc else "ASC"
+            sql += f" ORDER BY {_quote_identifier(query.order_by)} {direction}"
+        if query.limit is not None:
+            sql += f" LIMIT {query.limit}"
         return query.connection.execute_query(sql, query.params)
 
 
@@ -221,6 +275,10 @@ def _matches(row: dict[str, Any], condition: Condition | CompoundCondition) -> b
 
     if condition.operator == "starts_with":
         return (str(left) if left is not None else "").startswith(str(right))
+    if condition.operator == "ends_with":
+        return (str(left) if left is not None else "").endswith(str(right))
+    if condition.operator == "contains":
+        return str(right) in (str(left) if left is not None else "")
     if condition.operator == "==":
         return _comparable(left) == _comparable(right)
     if condition.operator == "!=":
@@ -252,6 +310,10 @@ def _sql_condition(condition: Condition | CompoundCondition) -> tuple[str, tuple
     column = _quote_identifier(condition.column)
     if condition.operator == "starts_with":
         return f"{column} LIKE ?", (f"{value}%",)
+    if condition.operator == "ends_with":
+        return f"{column} LIKE ?", (f"%{value}",)
+    if condition.operator == "contains":
+        return f"{column} LIKE ?", (f"%{value}%",)
     if condition.operator == "==":
         return f"{column} = ?", (value,)
     if condition.operator == "!=":
@@ -307,3 +369,14 @@ def _order_row(row: dict[str, Any], columns: tuple[str, ...]) -> dict[str, Any]:
 
 def _quote_identifier(identifier: str) -> str:
     return '"' + identifier.replace('"', '""') + '"'
+
+
+def _sort_key(value: Any) -> tuple:
+    """Return a (type_rank, value) tuple so mixed-type columns sort without TypeError."""
+    if value is None or value == "":
+        return (0, "")
+    if isinstance(value, bool):
+        return (1, int(value))
+    if isinstance(value, (int, float)):
+        return (1, value)
+    return (2, str(value).casefold())

@@ -20,6 +20,7 @@ from daquva.ast_nodes import (
     FindDuplicatesExpression,
     FunctionCall,
     FunctionDefinition,
+    LimitExpression,
     Literal,
     MergeExpression,
     OutputDestination,
@@ -29,6 +30,7 @@ from daquva.ast_nodes import (
     ReturnStatement,
     SaveStatement,
     ScanExpression,
+    SortExpression,
     TableReference,
     ValueNode,
     VariableReference,
@@ -125,6 +127,10 @@ class Parser:
             return self._delete_columns_expression()
         if token_type == TokenType.DELETE_ROWS:
             return self._delete_rows_expression()
+        if token_type == TokenType.SORT:
+            return self._sort_expression()
+        if token_type == TokenType.LIMIT:
+            return self._limit_expression()
 
         if token_type in {
             TokenType.IDENTIFIER,
@@ -250,6 +256,24 @@ class Parser:
         self._expect(TokenType.WHERE)
         return DeleteRowsExpression(source_name, self._condition())
 
+    def _sort_expression(self) -> SortExpression:
+        self._expect(TokenType.SORT)
+        source_name = str(self._expect(TokenType.IDENTIFIER).value)
+        self._match(TokenType.BY)
+        column = str(self._expect(TokenType.IDENTIFIER).value)
+        ascending = True
+        if self._match(TokenType.DESC):
+            ascending = False
+        else:
+            self._match(TokenType.ASC)
+        return SortExpression(source_name, column, ascending)
+
+    def _limit_expression(self) -> LimitExpression:
+        self._expect(TokenType.LIMIT)
+        source_name = str(self._expect(TokenType.IDENTIFIER).value)
+        count_token = self._expect(TokenType.NUMBER)
+        return LimitExpression(source_name, int(count_token.value))
+
     def _output_expression(self, value: ValueNode | None = None) -> OutputStatement:
         if value is None:
             value = self._value_or_variable()
@@ -341,6 +365,10 @@ class Parser:
 
         if self._match(TokenType.STARTS_WITH):
             return Condition(column, "starts_with", self._value_or_variable())
+        if self._match(TokenType.ENDS_WITH):
+            return Condition(column, "ends_with", self._value_or_variable())
+        if self._match(TokenType.CONTAINS):
+            return Condition(column, "contains", self._value_or_variable())
 
         operator_token = self._advance()
         operator_by_type = {

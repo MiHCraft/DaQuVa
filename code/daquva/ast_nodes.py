@@ -178,3 +178,16 @@ class FunctionCall:
 @dataclass(frozen=True)
 class ReturnStatement:
     value: ValueNode
+
+
+@dataclass(frozen=True)
+class SortExpression:
+    source_name: str
+    column: str
+    ascending: bool = True
+
+
+@dataclass(frozen=True)
+class LimitExpression:
+    source_name: str
+    count: int

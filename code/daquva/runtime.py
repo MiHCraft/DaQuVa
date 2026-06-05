@@ -19,6 +19,7 @@ from daquva.ast_nodes import (
     FindDuplicatesExpression,
     FunctionCall,
     FunctionDefinition,
+    LimitExpression,
     Literal,
     MergeExpression,
     OutputStatement,
@@ -27,6 +28,7 @@ from daquva.ast_nodes import (
     ReturnStatement,
     SaveStatement,
     ScanExpression,
+    SortExpression,
     TableReference,
     ValueNode,
     VariableReference,
@@ -141,6 +143,14 @@ class Runtime:
         if isinstance(expression, DeleteRowsExpression):
             table = self._expect_table_variable(expression.source_name)
             return table.delete_rows(self._resolve_condition(expression.condition))
+
+        if isinstance(expression, SortExpression):
+            table = self._expect_table_variable(expression.source_name)
+            return table.sort(expression.column, expression.ascending)
+
+        if isinstance(expression, LimitExpression):
+            table = self._expect_table_variable(expression.source_name)
+            return table.limit(expression.count)
 
         raise TypeError(f"Unsupported AST node: {type(expression).__name__}")
 

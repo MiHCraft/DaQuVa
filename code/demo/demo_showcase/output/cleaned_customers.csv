@@ -1,0 +1,6 @@
+id,name,email,age,city,plan,typo_suspect,typo_suggestion,typo_distance,merged_from_count
+1,Alice Johnson,alice@gmail.com,31,Berlin,premium,False,,,2
+4,Carla Smith,carla@gmail.com,28,Berlin,basic,False,,,2
+6,David Lee,david@company.org,45,London,premium,False,,,1
+7,Eva Mueller,eva@yahoo.com,33,Vienna,basic,False,,,1
+10,Hannah Brown,hannah@gmail.com,52,London,premium,False,,,1
