@@ -1,3 +1,28 @@
 \chapter*{Abstract}
 
-This abstract will be written in the end, after the all other report will be done
+Modern relational databases increasingly suffer from data quality problems
+including inconsistencies, duplicates, missing values, and constraint violations
+arising from heterogeneous data sources and evolving business rules. Existing
+solutions, ranging from interactive visual tools and SQL-based rule engines to
+enterprise data quality platforms and DSL-based pipeline frameworks, either embed
+validation logic in graphical interfaces or proprietary configurations, or focus
+on data transformation pipelines rather than on an explicit, reusable, and
+auditable specification of data quality constraints. This paper presents DaQuVa
+(Data Quality Validator), a novel domain-specific language designed to address
+these gaps by providing a declarative, safety-first approach to data quality
+enforcement in SQL databases. DaQuVa introduces a formally defined grammar, a
+sequential execution model, and a constrained expression language that makes
+programs straightforward to review and audit. The language provides core
+constructs for column-level scanning via pluggable validation tools,
+threshold-based filtering, local duplicate detection with optional AI-powered
+similarity scoring, controlled database writes through an explicit safety
+mechanism (\texttt{allowDanger}), result export to multiple sinks, and modular
+reusability through parameterized functions. A Python-based implementation
+comprising a regex-driven lexer, a recursive-descent parser, and an execution
+engine is described. Experimental evaluation demonstrates that DaQuVa can detect
+and flag erroneous records and near-duplicate entries across realistic datasets
+with concise, human-readable scripts, while its safety constraints prevent
+accidental data loss. Unlike general-purpose DSLs or tool-driven approaches,
+DaQuVa treats data quality rules as a formal, portable contract between technical
+teams and domain experts, contributing a practical foundation for reproducible
+and auditable data quality management.

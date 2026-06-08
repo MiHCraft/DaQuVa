@@ -3,20 +3,108 @@
 
 
 \section{Problem statement}
+
+Modern data-driven systems rely on large volumes of structured data stored in
+relational databases, data warehouses, and analytical pipelines. However,
+real-world datasets are frequently incomplete, inconsistent, duplicated, or
+semantically incorrect \cite{rahm2000data,chu2016datacleaning}.
+
+It is widely recognized that data cleaning and preparation consume more than
+50\% of the total effort in data science and analytics workflows
+\cite{rahm2000data,chu2016datacleaning}. This disproportionate cost indicates
+that data quality management is not a secondary concern but a structural
+component of modern information systems.
+
+Although relational databases provide basic integrity mechanisms such as primary
+keys, foreign keys, and type constraints, these mechanisms are insufficient to
+capture complex domain semantics. Higher-level business rules --- including
+conditional dependencies, cross-table constraints, and semantic validations ---
+are often implemented through ad-hoc SQL queries or embedded procedural scripts.
+
+This fragmented implementation strategy results in:
+\begin{itemize}[noitemsep]
+    \item Scattered and non-reusable validation logic,
+    \item Tight coupling between validation and execution details,
+    \item Limited auditability and traceability,
+    \item Separation between error detection and correction.
+\end{itemize}
+
+The ISO/IEC 25012 data quality model defines multiple quality characteristics,
+including accuracy, completeness, consistency, and credibility \cite{iso25012}.
+However, most practical systems lack a formal and executable specification
+mechanism aligned with such quality frameworks.
+
+Moreover, as AI-driven systems increasingly rely on structured datasets, the
+impact of low-quality data becomes amplified. Machine learning models are
+particularly sensitive to noise, bias, and inconsistencies in input data.
+Therefore, a systematic and formal approach to data validation is necessary.
+
 \section{Motivation and need for DSL}
 
-% Despite they are our concurents, the imperical reserch says that DSL in general helped, so, it is usefull to implement it. We use this info. 
-% https://www.arxiv.org/pdf/2505.16764
-%
+The motivation for introducing a Domain-Specific Language (DSL) for data quality
+validation is grounded in both empirical software engineering research and
+practical limitations of existing tools.
 
-% may be here about that it is needed for AI
-% https://dl.acm.org/doi/epdf/10.1145/3329486.3329493
+Empirical studies demonstrate that DSLs improve program structure comprehension
+and domain alignment compared to general-purpose solutions
+\cite{dsl-empirical-2025}. By providing domain-native abstractions, DSLs reduce
+boilerplate code and enhance maintainability.
 
+Current data quality solutions such as interactive cleaning systems
+\cite{wrangler,raman2001potterswheel}, configuration-driven validation tools, and
+research prototypes \cite{nadeef,holoclean,falcon,jayvee} demonstrate the
+importance of formalized rule systems. However, they often either:
+\begin{itemize}[noitemsep]
+    \item Embed rules within configuration files,
+    \item Focus exclusively on detection rather than integrated correction,
+    \item Lack a formally defined and reusable language layer.
+\end{itemize}
 
-% use also introduction from other articles where all them says that data cleaning takes more than 50% of data guys
+Interactive systems such as Wrangler and Potter's Wheel emphasize
+mixed-initiative data cleaning but primarily expose rule logic through graphical
+interfaces rather than portable specifications
+\cite{wrangler,raman2001potterswheel}. Research systems such as NADEEF and
+HoloClean demonstrate advanced repair strategies but do not focus on DSL
+formalization as a reusable contract \cite{nadeef,holoclean}.
+
+A DSL tailored for data quality validation provides several advantages:
+\begin{itemize}[noitemsep]
+    \item Declarative specification of validation rules,
+    \item Clear separation between rule definition and execution,
+    \item Reusability and modularity of quality constraints,
+    \item Compilation into multiple backends (SQL pushdown or streaming scans),
+    \item Integration of detection, suggestion, and correction policies.
+\end{itemize}
+
+Thus, the proposed DSL bridges the gap between low-level SQL validation,
+configuration-based systems, and interactive cleaning tools by introducing a
+unified and formally defined language for expressing data quality rules.
 
 \section{Target Audience}
-% From some of these papers also take this already written section about target audience. It already has been written
+
+The Data Quality Validator DSL is intended for a multidisciplinary audience
+involved in data-centric systems.
+\begin{itemize}[noitemsep]
+    \item \textbf{Data Engineers} --- who integrate validation rules into ETL and
+          orchestration frameworks. The DSL enables version-controlled and
+          auditable quality specifications.
+    \item \textbf{Data Analysts and BI Specialists} --- who rely on reliable
+          datasets for reporting and decision support.
+    \item \textbf{Data Scientists} --- whose workflows are significantly impacted
+          by data preparation costs \cite{chu2016datacleaning}. The DSL ensures
+          validation before model training.
+    \item \textbf{Database Administrators} --- who manage relational integrity
+          and require higher-level semantic validation beyond built-in
+          constraints.
+    \item \textbf{Domain Experts and Business Stakeholders} --- who define
+          business semantics but may not be proficient in SQL. A readable DSL
+          allows them to participate in quality rule definition.
+    \item \textbf{Researchers and Academic Community} --- who explore formal
+          methods in data validation and DSL design.
+\end{itemize}
+
+By acting as a shared data quality contract, the DSL connects domain semantics
+with technical execution mechanisms across different stakeholder roles.
 
 \section{Existing solutions analysis}
 %should be tables for comparative analysis
