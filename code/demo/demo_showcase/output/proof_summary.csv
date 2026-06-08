@@ -1,0 +1,5 @@
+stage,row_count,column_count,duplicate_group_count,duplicate_candidate_count,typo_suspect_count,input_rows_represented,rows_removed_by_merge
+raw,30,9,0,0,5,30,0
+paid_adults,25,9,0,0,5,25,0
+dupes,25,13,10,20,5,25,0
+merged,15,10,0,0,0,25,10

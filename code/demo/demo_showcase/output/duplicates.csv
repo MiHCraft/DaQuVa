@@ -6,3 +6,21 @@ id,name,email,age,city,plan,typo_suspect,typo_suggestion,typo_distance,duplicate
 6,David Lee,david@company.org,45,London,premium,False,,,,1.0,True,
 7,Eva Mueller,eva@yahoo.com,33,Vienna,basic,False,,,,1.0,True,
 10,Hannah Brown,hannah@gmail.com,52,London,premium,False,,,,1.0,True,
+11,Ian Wright,ian@hotmial.com,38,Dublin,premium,True,ian@hotmail.com,2,dup-3,0.8,False,ian wrihgt
+12,Ian Wrihgt,ian@hotmail.com,38,Dublin,premium,False,,,dup-3,1.0,True,
+13,Julia Novak,julia@yahoo.com,24,Prague,basic,False,,,dup-4,1.0,True,
+14,Julja Novak,julia.n@yahoo.com,24,Prague,basic,False,,,dup-4,0.909,False,julia novak
+15,Mark Brown,mark@gamil.com,36,Oslo,premium,True,mark@gmail.com,2,dup-5,0.9,False,marc brown
+16,Marc Brown,mark@gmail.com,36,Oslo,premium,False,,,dup-5,1.0,True,
+17,Nina Patel,n.patel@example.com,44,Amsterdam,premium,False,,,dup-6,1.0,True,
+18,Nena Patel,nena@example.com,44,Amsterdam,basic,False,,,dup-6,0.9,False,nina patel
+19,Omar Haddad,omar@company.org,41,London,premium,False,,,,1.0,True,
+21,Paul Costa,paul@outlook.com,29,Lisbon,basic,False,,,,1.0,True,
+22,Quinn Ross,qross@gmail.com,48,Berlin,premium,False,,,dup-7,1.0,True,
+23,Quinn Ros,q.ross@gmail.com,48,Berlin,premium,False,,,dup-7,0.9,False,quinn ross
+25,Samir Khan,samir@gmial.com,34,Chisinau,premium,True,samir@gmail.com,2,dup-8,0.8,False,samir kahn
+26,Samir Kahn,samir@gmail.com,34,Chisinau,premium,False,,,dup-8,1.0,True,
+27,Tania Popa,tania@startup.org,27,Chisinau,basic,False,,,dup-9,1.0,True,
+28,Tania Popp,tania.p@startup.org,27,Chisinau,basic,False,,,dup-9,0.9,False,tania popa
+29,Victor Ionescu,victor@outlook.com,40,Bucharest,premium,False,,,dup-10,1.0,True,
+30,Vitor Ionescu,victor@gamil.com,40,Bucharest,premium,True,victor@gmail.com,2,dup-10,0.929,False,victor ionescu

@@ -23,6 +23,7 @@ from daquva.table import (
     RenameColumnPlan,
     SortPlan,
     SourcePlan,
+    SummaryPlan,
     Table,
     ToolPlan,
 )
@@ -62,6 +63,12 @@ class ExecutionEngine:
         sql_query = self._compile_sql(plan)
         if sql_query is not None:
             return self._run_sql(sql_query)
+
+        if isinstance(plan, SummaryPlan):
+            return [
+                _summary_row(source.name, source.columns, self._execute(source.source))
+                for source in plan.sources
+            ]
 
         if isinstance(plan, SourcePlan):
             connection = self.connections[plan.connection_name]
@@ -380,3 +387,45 @@ def _sort_key(value: Any) -> tuple:
     if isinstance(value, (int, float)):
         return (1, value)
     return (2, str(value).casefold())
+
+
+def _summary_row(stage: str, columns: tuple[str, ...], rows: list[dict[str, Any]]) -> dict[str, Any]:
+    duplicate_groups = {
+        str(row.get("duplicate_group_id"))
+        for row in rows
+        if row.get("duplicate_group_id") not in (None, "")
+    }
+    duplicate_candidate_count = sum(
+        1 for row in rows if row.get("duplicate_group_id") not in (None, "")
+    )
+    typo_suspect_count = sum(1 for row in rows if _is_truthy(row.get("typo_suspect")))
+    input_rows_represented = sum(_merged_count(row) for row in rows) if rows else 0
+
+    return {
+        "stage": stage,
+        "row_count": len(rows),
+        "column_count": len(columns),
+        "duplicate_group_count": len(duplicate_groups),
+        "duplicate_candidate_count": duplicate_candidate_count,
+        "typo_suspect_count": typo_suspect_count,
+        "input_rows_represented": input_rows_represented,
+        "rows_removed_by_merge": max(input_rows_represented - len(rows), 0),
+    }
+
+
+def _merged_count(row: dict[str, Any]) -> int:
+    value = row.get("merged_from_count", 1)
+    if value in (None, ""):
+        return 1
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return 1
+
+
+def _is_truthy(value: Any) -> bool:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)):
+        return value != 0
+    return str(value).strip().casefold() in {"true", "yes", "1"}

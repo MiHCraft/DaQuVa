@@ -13,6 +13,26 @@ Key design principles include:
     \item \textbf{Extensibility}: Architecture allows integration of AI-based or rule-based tools for validation.
 \end{itemize}
 
+The implemented prototype was extended beyond the initial grammar with several
+user-facing features that are important for practical data exploration. The
+filter language now supports compound boolean expressions with explicit
+\texttt{AND} / \texttt{OR} precedence, string predicates
+\texttt{starts\_with}, \texttt{contains}, and \texttt{ends\_with}, result-set
+ordering through \texttt{sort}, row capping through \texttt{limit}, and an
+interactive REPL for incremental execution. Duplicate detection also accepts
+\texttt{levenshtein\_matcher} as an alias for the fuzzy duplicate matcher,
+making the matching strategy clearer in scripts that are specifically based on
+Levenshtein distance.
+
+The prototype additionally introduces a \texttt{summarize} command that
+produces a compact, aggregate \emph{proof} table over one or more pipeline
+stages. Rather than appending more annotation columns to the data, it collapses
+each named stage into a single row of metrics --- row count, column count,
+duplicate-group and duplicate-candidate counts, typo-suspect count, and the
+number of input rows represented after a merge --- so that the effect of a
+cleaning pipeline (for example, ``30 raw rows reduced to 15 merged rows'') can
+be exported and verified at a glance.
+
 
 \section{Initial DSL Grammar}
 \label{sec:grammar}
@@ -60,11 +80,16 @@ Function \& Control
 Commands
   & \texttt{scan},\quad \texttt{filter},\quad \texttt{merge},\quad
     \texttt{output},\quad \texttt{newTable},\quad
-    \texttt{findLocalDuplicates} \\
+    \texttt{findLocalDuplicates},\quad \texttt{sort},\quad \texttt{limit},\quad
+    \texttt{summarize} \\
 \hline
 Conditions \& Logic
   & \texttt{where},\quad \texttt{AND},\quad \texttt{OR},\quad
-    \texttt{columns} \\
+    \texttt{columns},\quad \texttt{starts\_with},\quad
+    \texttt{contains},\quad \texttt{ends\_with} \\
+\hline
+Ordering
+  & \texttt{by},\quad \texttt{asc},\quad \texttt{desc} \\
 \hline
 Tool Integration
   & \texttt{using},\quad \texttt{tool} \\
@@ -251,6 +276,9 @@ element.
   
   <command_statement> ::= <scan_command>
                         | <filter_command>
+                        | <sort_command>
+                        | <limit_command>
+                        | <summary_command>
                         | <find_duplicates_command>
                         | <merge_command>
                         | <output_command>
@@ -274,18 +302,16 @@ element.
   <filter_command>  ::= "filter" <identifier> "where" <condition>
   
   
-  <condition>       ::= <expression> <condition_tail>
-  
-  
-  <condition_tail>  ::= <logical_op> <expression> <condition_tail>
-                      | <empty>
-  
-  
-  <logical_op>      ::= "AND"
-                      | "OR"
-  
-  
-  <expression>      ::= <identifier> <comparison_op> <number>
+  <condition>       ::= <or_condition>
+
+  <or_condition>    ::= <and_condition> "OR" <or_condition>
+                      | <and_condition>
+
+  <and_condition>   ::= <expression> "AND" <and_condition>
+                      | <expression>
+
+  <expression>      ::= <identifier> <comparison_op> <value>
+                      | <identifier> <string_match_op> <value>
   
   
   <comparison_op>   ::= ">"
@@ -294,8 +320,31 @@ element.
                       | "<="
                       | "=="
                       | "!="
-  
-  
+
+
+  <string_match_op> ::= "starts_with"
+                      | "contains"
+                      | "ends_with"
+
+
+  <sort_command>    ::= "sort" <identifier>
+                        [ "by" ] <identifier> <opt_sort_direction>
+
+
+  <opt_sort_direction> ::= "asc"
+                         | "desc"
+                         | <empty>
+
+
+  <limit_command>   ::= "limit" <identifier> <number>
+
+
+  <summary_command> ::= "summarize" <identifier> <summary_tail>
+
+  <summary_tail>    ::= "," <identifier> <summary_tail>
+                      | <empty>
+
+
   <find_duplicates_command> ::= "findLocalDuplicates" <identifier>
                                 "columns" "[" <column_list> "]"
                                 <opt_using_tool>
@@ -422,9 +471,10 @@ Execution proceeds top-to-bottom. There are four statement kinds:
 
 Conditions used in \texttt{filter} commands consist of one or more
 \emph{expressions} joined by \texttt{AND} / \texttt{OR}. Each expression
-compares a column-level attribute (e.g.\ \texttt{dirty\_level}) to an integer
-threshold using a standard comparison operator. This deliberately limited
-expression language prevents arbitrary logic and keeps programs auditable.
+either compares a column-level attribute (e.g.\ \texttt{dirty\_level}) to a
+value using a standard comparison operator, or applies one of the supported
+string predicates. This deliberately limited expression language prevents
+arbitrary logic and keeps programs auditable.
 
 \subsubsection{Functions}
 
@@ -536,7 +586,7 @@ meta-column.
 if the tool name cannot be resolved, or if the database context has not been
 initialised.
 
-\subsubsection{\texttt{filter} --- Threshold Filtering}
+\subsubsection{\texttt{filter} --- Boolean and String Filtering}
 
 \begin{lstlisting}[style=bnf]
 <filter_command> ::= "filter" <identifier> "where" <condition>
@@ -547,12 +597,81 @@ rows that satisfy the given condition.
 
 \textbf{Execution.} Each row is evaluated against the condition; rows for which
 the condition is true are retained. Conditions may combine multiple predicates
-with \texttt{AND} / \texttt{OR}; evaluation follows standard boolean semantics
-with left-to-right associativity.
+with \texttt{AND} / \texttt{OR}; \texttt{AND} binds more tightly than
+\texttt{OR}, matching standard boolean precedence. Predicates may compare
+numeric or string values with \texttt{==}, \texttt{!=}, \texttt{>},
+\texttt{<}, \texttt{>=}, and \texttt{<=}, or apply string tests with
+\texttt{starts\_with}, \texttt{contains}, and \texttt{ends\_with}.
+
+\begin{lstlisting}[style=dsl]
+paid_adults = filter raw where age >= 18 AND plan != "free";
+major_providers = filter raw where email contains "@gmail" OR email contains "@outlook";
+org_users = filter raw where email ends_with ".org";
+\end{lstlisting}
 
 \textbf{Errors.} An error is raised if the referenced variable is undefined,
 if a column referenced in a condition does not exist in the result set, or if
 operand types are incompatible.
+
+\subsubsection{\texttt{sort} and \texttt{limit} --- Result-Set Ordering}
+
+\begin{lstlisting}[style=bnf]
+<sort_command>  ::= "sort" <identifier> [ "by" ] <identifier> [ "asc" | "desc" ]
+<limit_command> ::= "limit" <identifier> <number>
+\end{lstlisting}
+
+\textbf{Meaning.} \texttt{sort} produces a table ordered by a selected column,
+while \texttt{limit} returns only the first $n$ rows. Together they support
+common exploration workflows such as inspecting the oldest customers, highest
+scores, or first few suspicious records.
+
+\begin{lstlisting}[style=dsl]
+top5 = sort raw by age desc;
+top5 = limit top5 5;
+\end{lstlisting}
+
+\textbf{Execution.} In-memory tables are ordered by a stable mixed-type sort
+key so that empty, numeric, boolean, and string values can be handled without
+runtime type errors. When the source plan is backed by SQLite, sorting and
+limiting are pushed down into \texttt{ORDER BY} and \texttt{LIMIT} clauses.
+
+\subsubsection{\texttt{summarize} --- Aggregate Proof Summary}
+
+\begin{lstlisting}[style=bnf]
+<summary_command> ::= "summarize" <identifier> { "," <identifier> }
+\end{lstlisting}
+
+\textbf{Meaning.} \texttt{summarize} takes one or more previously bound result
+sets (the \emph{stages} of a pipeline) and produces a single new table in which
+\emph{each named stage becomes one row of aggregate metrics}. Unlike every other
+command, it does not add columns to the data --- it reduces each stage to a
+fixed schema of counts, giving an inspectable proof that a transformation
+actually happened.
+
+\textbf{Result schema.} The produced table has a fixed set of columns:
+\texttt{stage}, \texttt{row\_count}, \texttt{column\_count},
+\texttt{duplicate\_group\_count}, \texttt{duplicate\_candidate\_count},
+\texttt{typo\_suspect\_count}, \texttt{input\_rows\_represented}, and
+\texttt{rows\_removed\_by\_merge}. The last two are derived from the
+\texttt{merged\_from\_count} annotation so that a merge which collapses several
+input rows into one is reported as rows represented versus rows removed.
+
+\begin{lstlisting}[style=dsl]
+proof = summarize raw, paid_adults, dupes, merged;
+proof -> file "output/proof_summary.csv";
+save proof into proof_summary allowDanger;
+\end{lstlisting}
+
+\textbf{Execution.} For each stage, the engine materialises the underlying plan
+and computes the metrics in a single pass over the rows; duplicate groups are
+counted from distinct \texttt{duplicate\_group\_id} values, typo suspects from a
+truthy \texttt{typo\_suspect} flag, and represented input rows from the merge
+count. The resulting summary is an ordinary result set, so it can be exported to
+a CSV file or persisted to SQLite like any other table.
+
+\textbf{Errors.} An error is raised if any referenced stage variable is
+undefined, using the same \texttt{UndefinedVariable} condition as the other
+commands.
 
 \subsubsection{\texttt{findLocalDuplicates} --- Duplicate Detection}
 
@@ -565,7 +684,10 @@ operand types are incompatible.
 
 \textbf{Meaning.} Identifies rows within the input result set that are
 potential duplicates according to the specified key columns. An optional
-AI-powered tool (e.g.\ a fuzzy matcher) provides similarity scoring.
+AI-powered tool (e.g.\ a fuzzy matcher) provides similarity scoring. The
+implementation accepts both \texttt{fuzzy\_duplicates} and
+\texttt{levenshtein\_matcher}; the latter is an explicit alias for the same
+Levenshtein-distance based duplicate detection strategy.
 
 \textbf{Execution.} Rows are grouped by the specified columns; within each
 group, pairs are scored for similarity. The result set contains all candidate
@@ -650,7 +772,9 @@ whose result becomes a new column value (e.g.\ \texttt{length("name")}).
 \emph{first-defined} (must be defined before use in a top-to-bottom
 interpreter) and execute in their own variable scope. Parameters are
 positional; the number of arguments at the call site must match the parameter
-list.
+list. Function bodies may return either a value/variable or the direct result
+of another function call, which allows small helper functions to delegate to
+more specialized routines.
 
 \textbf{Errors.} Arity mismatch, calling an undefined function, or a
 \texttt{return} statement referencing an undefined variable all raise errors.
@@ -726,20 +850,28 @@ high_risk_emails = cleanEmails("users", 70);
 output high_risk_emails -> file "high_risk_emails.csv";
 output high_risk_emails -> console;
 
-# === 5. Detect near-duplicate records among high-risk rows ===
+# === 5. Explore high-risk records with string filters and top-N ordering ===
+major_providers = filter high_risk_emails
+                  where email contains "@gmail" OR email contains "@outlook";
+top_risk = sort high_risk_emails by dirty_level desc;
+top_risk = limit top_risk 5;
+output major_providers -> console;
+output top_risk -> console;
+
+# === 6. Detect near-duplicate records among high-risk rows ===
 duplicates = findLocalDuplicates high_risk_emails
              columns ["name", "dob"]
-             using tool "fuzzy_matcher";
+             using tool "levenshtein_matcher";
 
-# === 6. Merge duplicates back into the database (confidence >= 90%) ===
+# === 7. Merge duplicates back into the database (confidence >= 90%) ===
 merge duplicates -> Here(90) allowDanger;
 
-# === 7. Create a summary table for downstream analysis ===
+# === 8. Create a summary table for downstream analysis ===
 analysis_table = newTable "high_risk_analysis"
                  from high_risk_emails
                  addColumns [duplicate_score, length("name")];
 
-# === 8. Additional validation pass on the summary table ===
+# === 9. Additional validation pass on the summary table ===
 cli_result = scan analysis_table."email" using tool "typo_checker";
 output cli_result -> console;
 \end{lstlisting}
@@ -751,6 +883,8 @@ The program illustrates several semantic properties:
           scan-then-filter pipeline, making the threshold a tuneable parameter.
     \item The \texttt{output} command is used twice on the same variable,
           demonstrating that result sets are non-destructively consumed.
+    \item \texttt{contains}, \texttt{sort}, and \texttt{limit} support
+          interactive exploration without leaving the DSL.
     \item The \texttt{merge} command requires \texttt{allowDanger}
           because it writes to the live database, making the risky operation
           immediately visible to reviewers.
@@ -976,13 +1110,14 @@ This report has presented the complete formal grammar and semantic
 specification of the \textbf{Data Quality Validator} DSL. The BNF grammar
 in Section~\ref{sec:grammar} defines an unambiguous, minimal syntax
 covering database initialisation, column scanning, result filtering,
-duplicate detection and merging, result export, and table construction.
+duplicate detection and merging, result ordering, aggregate proof summaries,
+result export, and table construction.
 The semantic specification in Section~\ref{sec:semantics} assigns a precise
 meaning to each construct, documents execution rules, and enumerates the
 error conditions the runtime must detect and report.
 
 The language's design deliberately constrains expressiveness in favour of
 safety and auditability: destructive operations require explicit opt-in flags,
-and the expression language is limited to simple threshold comparisons,
-preventing opaque side effects. These properties make DaQuVa programs
-straightforward to review, test, and extend.
+and the expression language is limited to comparisons, boolean composition, and
+auditable string predicates rather than arbitrary side-effecting code. These
+properties make DaQuVa programs straightforward to review, test, and extend.

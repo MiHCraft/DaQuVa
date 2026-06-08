@@ -71,6 +71,7 @@ class TokenType(Enum):
     ASC = auto()
     DESC = auto()
     LIMIT = auto()
+    SUMMARIZE = auto()
     AND = auto()
     OR = auto()
     EOF = auto()
@@ -112,6 +113,7 @@ KEYWORDS = {
     "asc": TokenType.ASC,
     "desc": TokenType.DESC,
     "limit": TokenType.LIMIT,
+    "summarize": TokenType.SUMMARIZE,
     "AND": TokenType.AND,
     "OR": TokenType.OR,
     "true": TokenType.TRUE,

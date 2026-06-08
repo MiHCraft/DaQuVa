@@ -19,6 +19,8 @@ Key design decisions:
 KEYWORDS = frozenset({
     'my', 'db', 'function', 'return', 'end', 'scan', 'filter', 'merge',
     'output', 'newTable', 'findLocalDuplicates', 'where', 'AND', 'OR',
+    'starts_with', 'contains', 'ends_with', 'sort', 'by', 'asc', 'desc',
+    'limit', 'summarize',
     'columns', 'using', 'tool', 'console', 'file', 'from', 'addColumns',
     'Here', 'allowDanger'
 })
@@ -117,7 +119,7 @@ class Parser:
     # here for brevity. Each returns the corresponding AST node.
 \end{lstlisting}
 
-Every parsing method directly corresponds to a BNF production (e.g.\ \texttt{\_parse\_scan} implements \bnf{<scan\_command>}, \texttt{\_parse\_condition} implements the left-associative \bnf{<condition>} etc.). Error messages include source position for excellent developer experience.
+Every parsing method directly corresponds to a BNF production (e.g.\ \texttt{\_parse\_scan} implements \bnf{<scan\_command>}). Compound filters are parsed through separate \texttt{\_or\_condition} and \texttt{\_and\_condition} methods, which gives \texttt{AND} higher precedence than \texttt{OR}. The parser also recognises the latest command forms for \texttt{sort}, \texttt{limit}, \texttt{contains}, and \texttt{ends\_with}, and accepts a direct function call after \texttt{return}. Error messages include source position for excellent developer experience.
 
 \section{AST}
 
@@ -162,6 +164,12 @@ class Filter(ASTNode):
     condition: ASTNode
 
 @dataclass
+class CompoundCondition(ASTNode):
+    left: ASTNode
+    op: str
+    right: ASTNode
+
+@dataclass
 class FindDuplicates(ASTNode):
     source: str
     columns: List[str]
@@ -184,6 +192,21 @@ class NewTable(ASTNode):
     name: str
     source: Optional[str]
     columns: List[ASTNode]
+
+@dataclass
+class SortExpression(ASTNode):
+    source: str
+    column: str
+    ascending: bool
+
+@dataclass
+class LimitExpression(ASTNode):
+    source: str
+    count: int
+
+@dataclass
+class SummaryExpression(ASTNode):
+    source_names: Tuple[str, ...]   # one or more stages to summarize
 
 @dataclass
 class BinaryOp(ASTNode):
@@ -209,6 +232,130 @@ A simple \texttt{print\_ast} pretty-printer (included in the implementation) pro
 
 The lexer, parser, and AST together form a complete front-end that can already parse every valid DaQuVa program defined in the language specification.
 
-\section{semantic analysis}
-\section{execution engine}
+\section{Semantic Analysis and Runtime}
+
+The runtime phase resolves parsed AST nodes against the active execution
+context. It registers CSV and SQLite connections, stores in-memory variables,
+tracks user-defined functions, and turns table expressions into lazy logical
+plans. This design keeps parsing independent from file systems and databases:
+the parser only validates syntax, while the runtime validates names, columns,
+tool availability, and output destinations.
+
+Important runtime checks added in the current implementation include:
+
+\begin{itemize}
+    \item \textbf{Column validation}: filter conditions and projected columns
+          are checked against the available schema. A misspelled condition
+          column now raises an explicit error that lists available columns
+          instead of silently producing an empty result.
+    \item \textbf{Function return handling}: function bodies may return a
+          variable, literal, or another function call, enabling composition of
+          small reusable routines.
+    \item \textbf{Controlled persistence}: output to a database destination
+          accepts an \texttt{allowDanger} flag. The SQLite writer uses this
+          flag when replacing persisted data, keeping potentially destructive
+          writes visible in DSL scripts.
+    \item \textbf{Tool aliases}: \texttt{levenshtein\_matcher} is resolved as
+          an alias of the fuzzy duplicate detection implementation.
+\end{itemize}
+
+\section{Execution Engine}
+
+The execution engine evaluates lazy logical plans and chooses the most suitable
+backend strategy. For CSV-backed data, plans are materialized and evaluated in
+Python. For SQLite-backed data, simple relational operations are compiled into
+SQL whenever possible.
+
+The latest implementation extends the executable plan set with
+\texttt{SortPlan} and \texttt{LimitPlan}. In Python execution, \texttt{sort}
+uses a mixed-type safe key so that empty values, numbers, booleans, and strings
+do not produce unhandled \texttt{TypeError} exceptions. For SQLite plans,
+\texttt{filter}, \texttt{sort}, and \texttt{limit} are pushed down into SQL:
+\texttt{WHERE}, \texttt{ORDER BY}, and \texttt{LIMIT} are generated directly
+against the source table.
+
+String predicates are also executable in both backends. In memory, they are
+evaluated with Python string operations. In SQLite, \texttt{starts\_with},
+\texttt{contains}, and \texttt{ends\_with} are translated into parameterized
+\texttt{LIKE} expressions:
+
+\begin{lstlisting}[style=dsl]
+email starts_with "a"    -> email LIKE "a%"
+email contains "@gmail"  -> email LIKE "%@gmail%"
+email ends_with ".org"   -> email LIKE "%.org"
+\end{lstlisting}
+
+Several correctness fixes were made in the execution layer. CSV input values
+are stripped of surrounding whitespace before storage, preventing equality
+filters from failing on visually identical strings. Numeric comparisons now
+produce a clear \texttt{ValueError} when ordered comparisons are attempted
+against incompatible non-numeric strings. SQLite table replacement was also
+made safer by creating a temporary replacement table and atomically renaming it
+only after creation succeeds.
+
+The plan set is further extended with a \texttt{SummaryPlan}, which carries a
+tuple of \texttt{SummarySource} entries (the stage name, its logical plan, and
+its column list). When the engine encounters a \texttt{SummaryPlan} it
+materialises each source and reduces it to one metrics row via a small
+\texttt{\_summary\_row} helper. That helper counts distinct
+\texttt{duplicate\_group\_id} values, sums the \texttt{merged\_from\_count}
+annotation to recover how many input rows a merged result represents, and uses a
+tolerant truthiness check for the \texttt{typo\_suspect} flag so that string,
+boolean, and numeric encodings are all interpreted consistently. Because the
+summary is emitted as an ordinary list of row dictionaries with a fixed
+\texttt{SUMMARY\_COLUMNS} schema, it flows through the existing CSV and SQLite
+writers unchanged.
+
+\section{Interactive REPL}
+
+DaQuVa now includes an interactive REPL started with:
+
+\begin{lstlisting}[style=dsl]
+python -m daquva --repl
+\end{lstlisting}
+
+The REPL keeps a persistent runtime context, so users can declare connections,
+assign intermediate tables, inspect variables, and print results without
+rerunning an entire script. It buffers multi-line input until a semicolon or
+function-closing brace is present, then parses and executes the accumulated
+snippet. Meta-commands provide lightweight inspection:
+
+\begin{itemize}
+    \item \texttt{:help} prints available REPL commands and examples.
+    \item \texttt{:tables} lists active connections.
+    \item \texttt{:vars} lists in-memory variables and table schemas.
+    \item \texttt{:quit} exits the session.
+\end{itemize}
+
+After an assignment, the REPL reports the variable name, row count, column
+count, and column names. This immediate feedback is useful for a demonstration
+setting because each transformation can be inspected before the next command is
+entered.
+
+\section{Showcase Demo}
+
+A new end-to-end showcase script was added under
+\texttt{code/demo/demo\_showcase}. It demonstrates the latest implemented
+features in one narrative pipeline: typo detection, compound
+\texttt{AND}/\texttt{OR} filters, provider filtering with \texttt{contains},
+top-$n$ exploration with \texttt{sort} and \texttt{limit}, domain filtering
+with \texttt{ends\_with}, fuzzy duplicate detection and merge, CSV export, and
+SQLite persistence with \texttt{allowDanger}.
+
+To make the pipeline auditable, the demo input was enlarged to 30 customer rows
+containing deliberate near-duplicates and email typos, and the script ends with
+a \texttt{summarize} step that proves the cleaning effect:
+
+\begin{lstlisting}[style=dsl]
+proof = summarize raw, paid_adults, dupes, merged;
+proof -> file "output/proof_summary.csv";
+save proof into proof_summary allowDanger;
+\end{lstlisting}
+
+This closes the loop required of a data-quality tool: a concrete CSV
+\emph{input}, cleaned CSV and SQLite \emph{outputs}, and an aggregate summary
+that is itself written to both CSV (\texttt{output/proof\_summary.csv}) and a
+SQLite table (\texttt{proof\_summary}). The summary does not merely append
+columns; it reports before/after row counts so a reviewer can confirm, for
+example, that 30 raw rows were reduced to 15 merged rows representing 25 inputs.
 

@@ -1,5 +1,5 @@
 // ================================================================
-// DaQuVa Showcase — end-to-end data quality pipeline
+// DaQuVa Showcase - end-to-end data quality pipeline
 // Run: python -m daquva demo/demo_showcase/showcase.dqv
 // ================================================================
 
@@ -7,45 +7,51 @@ csv db   "input/customers.csv";
 sqlite out "output/showcase.sqlite";
 
 
-// ── Step 1: load and scan for email typos ───────────────────────
+// Step 1: load and scan for email typos.
 raw = scan db.customers using_tool typo_detector("email");
 raw -> console;
 
 
-// ── Step 2: compound filters (AND / OR) ─────────────────────────
-// Adults on a paid plan
+// Step 2: compound filters (AND / OR).
+// Adults on a paid plan.
 paid_adults = filter raw where age >= 18 AND plan != "free";
 
-// Gmail or Outlook users
+// Gmail or Outlook users.
 major_providers = filter raw where email contains "@gmail" OR email contains "@outlook";
 
-paid_adults    -> console;
+paid_adults -> console;
 major_providers -> console;
 
 
-// ── Step 3: sort and limit ───────────────────────────────────────
-// Top-5 oldest customers, premium first (sort by age descending)
+// Step 3: sort and limit.
+// Top-5 oldest customers by age.
 top5 = sort raw by age desc;
 top5 = limit top5 5;
 top5 -> console;
 
 
-// ── Step 4: string operators ─────────────────────────────────────
-// Everyone whose email ends with .org
+// Step 4: string operators.
+// Everyone whose email ends with .org.
 org_users = filter raw where email ends_with ".org";
 org_users -> console;
 
 
-// ── Step 5: fuzzy duplicate detection and merge ──────────────────
-adult_paid = filter raw where age >= 18 AND plan != "free";
-dupes  = find_duplicates adult_paid[name] using tool fuzzy_duplicates(2);
+// Step 5: fuzzy duplicate detection and merge.
+dupes  = find_duplicates paid_adults[name] using tool fuzzy_duplicates(2);
 merged = merge dupes;
 
 dupes  -> file "output/duplicates.csv";
 merged -> file "output/cleaned_customers.csv";
 
 
-// ── Step 6: persist clean results ───────────────────────────────
-save merged into clean_customers allowDanger;
+// Step 6: proof summary.
+// This table proves the pipeline effect without just appending more columns.
+proof = summarize raw, paid_adults, dupes, merged;
+proof -> file "output/proof_summary.csv";
 
-merged -> console;
+
+// Step 7: persist cleaned data and proof summary to SQLite.
+save merged into clean_customers allowDanger;
+save proof into proof_summary allowDanger;
+
+proof -> console;

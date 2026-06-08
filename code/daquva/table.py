@@ -22,6 +22,17 @@ DUPLICATE_METADATA_COLUMNS = (
 
 TYPO_METADATA_COLUMNS = ("typo_suspect", "typo_suggestion", "typo_distance")
 
+SUMMARY_COLUMNS = (
+    "stage",
+    "row_count",
+    "column_count",
+    "duplicate_group_count",
+    "duplicate_candidate_count",
+    "typo_suspect_count",
+    "input_rows_represented",
+    "rows_removed_by_merge",
+)
+
 
 @dataclass(frozen=True)
 class SourcePlan:
@@ -115,6 +126,18 @@ class LimitPlan:
     count: int
 
 
+@dataclass(frozen=True)
+class SummarySource:
+    name: str
+    source: "LogicalPlan"
+    columns: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class SummaryPlan:
+    sources: tuple[SummarySource, ...]
+
+
 LogicalPlan = (
     SourcePlan
     | ProjectPlan
@@ -130,6 +153,7 @@ LogicalPlan = (
     | DeleteRowsPlan
     | SortPlan
     | LimitPlan
+    | SummaryPlan
 )
 
 

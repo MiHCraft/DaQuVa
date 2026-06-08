@@ -1,5 +1,36 @@
 \chapter{Discussion}
 
-\section{What was good}
+\section{Strengths of the Current Prototype}
 
-\section{What comes to be bad}
+The strongest aspect of the current DaQuVa prototype is that the language now
+covers a complete cleaning workflow rather than isolated syntax examples. A
+user can load CSV or SQLite data, run scans, combine filters with
+\texttt{AND}/\texttt{OR}, apply string predicates, inspect the most relevant
+rows with \texttt{sort} and \texttt{limit}, detect near duplicates, merge them,
+and export the cleaned table. The \texttt{summarize} command rounds out this
+workflow with an aggregate proof table that reports before/after row counts for
+each stage, so a reviewer can confirm that cleaning actually reduced the data
+rather than just inspecting individual rows. The new REPL strengthens the
+workflow further because it supports incremental exploration without repeatedly
+running a full script.
+
+The implementation also keeps destructive operations visible. Database writes
+require explicit syntax such as \texttt{allowDanger}, and the SQLite output path
+uses a safer temporary-table replacement strategy. This matches the original
+safety-first design goal of the language.
+
+\section{Limitations and Future Work}
+
+The prototype is still intentionally small. The expression language supports
+comparisons, boolean composition, and a few string predicates, but it does not
+yet provide joins, date operations, or user-defined validators. Aggregation is
+currently limited to the fixed-schema \texttt{summarize} proof table; there is
+no general \texttt{group by} with user-chosen aggregate functions. The REPL is useful for exploration, but it does not yet provide
+autocomplete, command history persistence, or static diagnostics before
+execution.
+
+Future work should focus on broadening the type system, adding a formal test
+suite around the demo scenarios, and extending SQL pushdown to more operations.
+Another important direction is improving documentation synchronization so that
+the BNF, parser implementation, examples, and report remain aligned as the DSL
+evolves.

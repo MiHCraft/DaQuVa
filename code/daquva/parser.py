@@ -31,6 +31,7 @@ from daquva.ast_nodes import (
     SaveStatement,
     ScanExpression,
     SortExpression,
+    SummaryExpression,
     TableReference,
     ValueNode,
     VariableReference,
@@ -131,6 +132,8 @@ class Parser:
             return self._sort_expression()
         if token_type == TokenType.LIMIT:
             return self._limit_expression()
+        if token_type == TokenType.SUMMARIZE:
+            return self._summary_expression()
 
         if token_type in {
             TokenType.IDENTIFIER,
@@ -273,6 +276,13 @@ class Parser:
         source_name = str(self._expect(TokenType.IDENTIFIER).value)
         count_token = self._expect(TokenType.NUMBER)
         return LimitExpression(source_name, int(count_token.value))
+
+    def _summary_expression(self) -> SummaryExpression:
+        self._expect(TokenType.SUMMARIZE)
+        source_names = [str(self._expect(TokenType.IDENTIFIER).value)]
+        while self._match(TokenType.COMMA):
+            source_names.append(str(self._expect(TokenType.IDENTIFIER).value))
+        return SummaryExpression(tuple(source_names))
 
     def _output_expression(self, value: ValueNode | None = None) -> OutputStatement:
         if value is None:

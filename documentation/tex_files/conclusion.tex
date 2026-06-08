@@ -1,4 +1,25 @@
 \addcontentsline{toc}{chapter}{Conclusions}
 \chapter*{Conclusions}
 
-Here go your conclusions..
+DaQuVa demonstrates that a compact domain-specific language can express common
+data-quality workflows over tabular data without requiring users to write SQL
+or general-purpose Python scripts. The current prototype covers connection
+declaration, table scanning, filtering, duplicate detection, merging, export,
+controlled persistence, and an aggregate \texttt{summarize} command that emits a
+proof table of before/after row counts for an end-to-end pipeline.
+
+The latest implementation work improves both expressiveness and usability.
+Compound filters now support \texttt{AND} / \texttt{OR} logic with clear
+precedence, string predicates cover prefix, substring, and suffix matching,
+and \texttt{sort} plus \texttt{limit} make exploratory top-$n$ queries possible
+inside the DSL. The \texttt{summarize} command lets a pipeline emit an
+inspectable proof of its effect to both CSV and SQLite, closing the
+input--output--evidence loop expected of a data-quality tool. The interactive
+REPL further supports incremental development by allowing users to execute
+statements one at a time and inspect intermediate tables.
+
+The runtime has also become safer and more predictable through clearer column
+errors, safer SQLite replacement writes, normalized CSV string values, and
+better handling of incompatible comparisons. These changes move DaQuVa from a
+syntax prototype toward an executable data-quality tool that can be demonstrated
+end to end on realistic cleaning scenarios.

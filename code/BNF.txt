@@ -259,6 +259,7 @@
                        | <scan_expression>
                        | <function_call_expression>
                        | <find_duplicates_expression>
+                       | <summary_expression>
 
 
 // ============================================================
@@ -419,6 +420,23 @@
                                 <duplicate_tool_param_list>
 
 <duplicate_tool_param> ::= <value_or_variable>
+
+
+// ============================================================
+// SUMMARY EXPRESSION
+// summarize collapses one or more stages into an aggregate
+// proof table (one metrics row per stage)
+// ============================================================
+
+<summary_expression> ::= summarize
+                         <optional_spaces>
+                         <summary_source_list>
+
+<summary_source_list> ::= <identifier>
+                          ","
+                          <optional_spaces>
+                          <summary_source_list>
+                        | <identifier>
 
 
 // ============================================================

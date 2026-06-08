@@ -29,6 +29,7 @@ from daquva.ast_nodes import (
     SaveStatement,
     ScanExpression,
     SortExpression,
+    SummaryExpression,
     TableReference,
     ValueNode,
     VariableReference,
@@ -38,7 +39,7 @@ from daquva.connections.sqlite_connection import SQLiteConnection
 from daquva.execution_engine import ExecutionEngine
 from daquva.outputs.csv_output import write_csv
 from daquva.outputs.sqlite_output import write_sqlite
-from daquva.table import SourcePlan, Table
+from daquva.table import SUMMARY_COLUMNS, SourcePlan, SummaryPlan, SummarySource, Table
 from daquva.utils.pretty_print import pretty_print
 
 
@@ -151,6 +152,13 @@ class Runtime:
         if isinstance(expression, LimitExpression):
             table = self._expect_table_variable(expression.source_name)
             return table.limit(expression.count)
+
+        if isinstance(expression, SummaryExpression):
+            sources = []
+            for source_name in expression.source_names:
+                table = self._expect_table_variable(source_name)
+                sources.append(SummarySource(source_name, table.plan, table.columns))
+            return Table(SummaryPlan(tuple(sources)), SUMMARY_COLUMNS, (), "summary")
 
         raise TypeError(f"Unsupported AST node: {type(expression).__name__}")
 

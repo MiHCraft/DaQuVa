@@ -191,3 +191,8 @@ class SortExpression:
 class LimitExpression:
     source_name: str
     count: int
+
+
+@dataclass(frozen=True)
+class SummaryExpression:
+    source_names: tuple[str, ...]
