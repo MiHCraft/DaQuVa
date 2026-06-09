@@ -1,6 +1,6 @@
 # DaQuVa
 
-DaQuVa means **Data Query Validation**. It is a small Python DSL for validating and transforming tabular data from CSV and SQLite sources.
+DaQuVa means **Data Quality Validation**. It is a small Python DSL for validating and transforming tabular data from CSV and SQLite sources.
 
 DaQuVa is not an ORM and it is not an in-memory dataframe engine. Table variables store lazy logical relational plans. Rows are fetched only when a program asks for materialization through console output, CSV output, or SQLite save/output.
 
