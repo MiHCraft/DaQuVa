@@ -56,7 +56,22 @@ from daquva.parser import Parser
 prog = Parser(Lexer(Path('$SHOWCASE').read_text(encoding='utf-8')).tokenize()).parse()
 print(f'connections: {len(prog.connections)}   statements: {len(prog.statements)}')
 for s in prog.statements:
-    print('  -', type(s).__name__, repr(s)[:88])
+    kind = type(s).__name__
+    if kind == 'Assignment':
+        desc = f'{s.target} = {type(s.expression).__name__}'
+    elif kind == 'OutputStatement':
+        tgt = getattr(s.value, 'name', '?')
+        dest = getattr(s.destination, 'kind', '?')
+        extra = getattr(s.destination, 'target', None)
+        desc = f'{tgt} -> {dest}'
+        if extra:
+            desc = desc + ' ' + str(extra)
+    elif kind == 'SaveStatement':
+        src = getattr(s.source, 'name', '?')
+        desc = f'{src} into {s.table_name}'
+    else:
+        desc = repr(s)[:50]
+    print(f'  {kind:16} {desc}')
 "@)
 
 # ---- 4. Execute the whole pipeline -----------------------------
