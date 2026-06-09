@@ -7,11 +7,11 @@ The implementation of the DaQuVa DSL follows a classic compiler pipeline: lexer 
 The lexer is a hand-written, regex-based tokenizer that converts the raw source code into a flat stream of tokens. It explicitly recognises every terminal symbol defined in the BNF (keywords, identifiers, literals, operators, punctuation) while discarding insignificant whitespace and comments. Although the grammar now defines <\texttt{\<SingleSpace\>}> and <\texttt{\<OneOrMoreSpaces\>}> for formal completeness, the lexer follows the standard convention (explicitly stated in the BNF note) and treats whitespace purely as a token separator.
 
 Key design decisions:
-\begin{itemize}
-    \item All reserved words are turned into a single \texttt{KW} token.
-    \item Whitespace (\texttt{[ \t\r\n]+}) and single-line comments (\texttt{\#.*}) are silently skipped.
-    \item Multi-character operators (\texttt{->}, \texttt{==}, \texttt{!=}, \texttt{>=}, \texttt{<=}) are recognised before single-character ones.
-    \item String literals have their surrounding quotes stripped.
+\begin{itemize}[label=-, noitemsep]
+    \item All reserved words are turned into a single \texttt{KW} token;
+    \item Whitespace (\texttt{[ \t\r\n]+}) and single-line comments (\texttt{\#.*}) are silently skipped;
+    \item Multi-character operators (\texttt{->}, \texttt{==}, \texttt{!=}, \texttt{>=}, \texttt{<=}) are recognised before single-character ones;
+    \item String literals have their surrounding quotes stripped;
     \item Numbers are immediately converted to Python \texttt{int}.
 \end{itemize}
 
@@ -83,8 +83,8 @@ The lexer produces exactly the token stream expected by the recursive-descent pa
 
 The parser is a classic recursive-descent implementation that mirrors the BNF structure one-to-one. It uses the lexer’s \texttt{peek}/\texttt{consume} interface and builds the AST on the fly. Two small practical adaptations were introduced for real-world usability while staying faithful to the formal grammar:
 
-\begin{itemize}
-    \item Function bodies are terminated by the keyword \texttt{end} (the original BNF used pure recursion without an explicit closer; \texttt{end} makes the language non-indentation-sensitive).
+\begin{itemize}[label=-, noitemsep]
+    \item Function bodies are terminated by the keyword \texttt{end} (the original BNF used pure recursion without an explicit closer; \texttt{end} makes the language non-indentation-sensitive);
     \item The \texttt{return} statement (already present in the keyword table) was given its own AST node.
 \end{itemize}
 
@@ -227,6 +227,7 @@ class Variable(ASTNode):
 class Literal(ASTNode):
     value: Union[int, str]
 \end{lstlisting}
+\par\normalfont
 
 A simple \texttt{print\_ast} pretty-printer (included in the implementation) produces human-readable tree views for debugging. The AST serves as the single source of truth for all subsequent phases (semantic analysis, execution engine, pretty-printing, etc.).
 
@@ -243,18 +244,18 @@ tool availability, and output destinations.
 
 Important runtime checks added in the current implementation include:
 
-\begin{itemize}
+\begin{itemize}[label=-, noitemsep]
     \item \textbf{Column validation}: filter conditions and projected columns
           are checked against the available schema. A misspelled condition
           column now raises an explicit error that lists available columns
-          instead of silently producing an empty result.
+          instead of silently producing an empty result;
     \item \textbf{Function return handling}: function bodies may return a
           variable, literal, or another function call, enabling composition of
-          small reusable routines.
+          small reusable routines;
     \item \textbf{Controlled persistence}: output to a database destination
           accepts an \texttt{allowDanger} flag. The SQLite writer uses this
           flag when replacing persisted data, keeping potentially destructive
-          writes visible in DSL scripts.
+          writes visible in DSL scripts;
     \item \textbf{Tool aliases}: \texttt{levenshtein\_matcher} is resolved as
           an alias of the fuzzy duplicate detection implementation.
 \end{itemize}
@@ -320,10 +321,10 @@ rerunning an entire script. It buffers multi-line input until a semicolon or
 function-closing brace is present, then parses and executes the accumulated
 snippet. Meta-commands provide lightweight inspection:
 
-\begin{itemize}
-    \item \texttt{:help} prints available REPL commands and examples.
-    \item \texttt{:tables} lists active connections.
-    \item \texttt{:vars} lists in-memory variables and table schemas.
+\begin{itemize}[label=-, noitemsep]
+    \item \texttt{:help} prints available REPL commands and examples;
+    \item \texttt{:tables} lists active connections;
+    \item \texttt{:vars} lists in-memory variables and table schemas;
     \item \texttt{:quit} exits the session.
 \end{itemize}
 

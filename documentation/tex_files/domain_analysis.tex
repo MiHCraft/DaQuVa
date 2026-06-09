@@ -22,10 +22,10 @@ conditional dependencies, cross-table constraints, and semantic validations ---
 are often implemented through ad-hoc SQL queries or embedded procedural scripts.
 
 This fragmented implementation strategy results in:
-\begin{itemize}[noitemsep]
-    \item Scattered and non-reusable validation logic,
-    \item Tight coupling between validation and execution details,
-    \item Limited auditability and traceability,
+\begin{itemize}[label=-, noitemsep]
+    \item Scattered and non-reusable validation logic;
+    \item Tight coupling between validation and execution details;
+    \item Limited auditability and traceability;
     \item Separation between error detection and correction.
 \end{itemize}
 
@@ -54,9 +54,9 @@ Current data quality solutions such as interactive cleaning systems
 \cite{wrangler,raman2001potterswheel}, configuration-driven validation tools, and
 research prototypes \cite{nadeef,holoclean,falcon,jayvee} demonstrate the
 importance of formalized rule systems. However, they often either:
-\begin{itemize}[noitemsep]
-    \item Embed rules within configuration files,
-    \item Focus exclusively on detection rather than integrated correction,
+\begin{itemize}[label=-, noitemsep]
+    \item Embed rules within configuration files;
+    \item Focus exclusively on detection rather than integrated correction;
     \item Lack a formally defined and reusable language layer.
 \end{itemize}
 
@@ -68,11 +68,11 @@ HoloClean demonstrate advanced repair strategies but do not focus on DSL
 formalization as a reusable contract \cite{nadeef,holoclean}.
 
 A DSL tailored for data quality validation provides several advantages:
-\begin{itemize}[noitemsep]
-    \item Declarative specification of validation rules,
-    \item Clear separation between rule definition and execution,
-    \item Reusability and modularity of quality constraints,
-    \item Compilation into multiple backends (SQL pushdown or streaming scans),
+\begin{itemize}[label=-, noitemsep]
+    \item Declarative specification of validation rules;
+    \item Clear separation between rule definition and execution;
+    \item Reusability and modularity of quality constraints;
+    \item Compilation into multiple backends (SQL pushdown or streaming scans);
     \item Integration of detection, suggestion, and correction policies.
 \end{itemize}
 
@@ -84,21 +84,21 @@ unified and formally defined language for expressing data quality rules.
 
 The Data Quality Validator DSL is intended for a multidisciplinary audience
 involved in data-centric systems.
-\begin{itemize}[noitemsep]
+\begin{itemize}[label=-, noitemsep]
     \item \textbf{Data Engineers} --- who integrate validation rules into ETL and
           orchestration frameworks. The DSL enables version-controlled and
-          auditable quality specifications.
+          auditable quality specifications;
     \item \textbf{Data Analysts and BI Specialists} --- who rely on reliable
           datasets for reporting and decision support.
     \item \textbf{Data Scientists} --- whose workflows are significantly impacted
           by data preparation costs \cite{chu2016datacleaning}. The DSL ensures
-          validation before model training.
+          validation before model training;
     \item \textbf{Database Administrators} --- who manage relational integrity
           and require higher-level semantic validation beyond built-in
-          constraints.
+          constraints;
     \item \textbf{Domain Experts and Business Stakeholders} --- who define
           business semantics but may not be proficient in SQL. A readable DSL
-          allows them to participate in quality rule definition.
+          allows them to participate in quality rule definition;
     \item \textbf{Researchers and Academic Community} --- who explore formal
           methods in data validation and DSL design.
 \end{itemize}
@@ -318,9 +318,9 @@ A pipeline is a strictly ordered sequence of computational units called \emph{bl
 This enforces an explicit, linear dataflow model that makes transformations, dependencies, and execution order unambiguous.
 
 Jayvee defines three fundamental categories of blocks:
-\begin{itemize}
-    \item \textbf{Extractor blocks} — model data sources (e.g., HTTP endpoints, filesystems, databases) and introduce data into the pipeline.
-    \item \textbf{Transformator blocks} — perform structured transformations, filtering, selection, and interpretation of intermediate data representations.
+\begin{itemize}[label=-, noitemsep]
+    \item \textbf{Extractor blocks} — model data sources (e.g., HTTP endpoints, filesystems, databases) and introduce data into the pipeline;
+    \item \textbf{Transformator blocks} — perform structured transformations, filtering, selection, and interpretation of intermediate data representations;
     \item \textbf{Loader blocks} — represent data sinks and persist processed data into storage systems.
 \end{itemize}
 
@@ -336,11 +336,11 @@ Furthermore, it allows the definition of \emph{composite block types}, which are
 This enables modularization, reuse, and abstraction of complex processing logic into reusable components.
 
 From a software engineering perspective, Jayvee can be classified as a \emph{typed dataflow DSL} that exhibits:
-\begin{itemize}
-    \item an explicit and structured pipeline model,
-    \item formally specified computational units,
-    \item a domain-oriented type system,
-    \item built-in constraint-based data validation, and
+\begin{itemize}[label=-, noitemsep]
+    \item an explicit and structured pipeline model;
+    \item formally specified computational units;
+    \item a domain-oriented type system;
+    \item built-in constraint-based data validation;
     \item mechanisms for modular composition and reuse.
 \end{itemize}
 Consequently, Jayvee transcends traditional transformation scripting and serves as a formal modeling language for data pipelines with integrated data quality semantics.
@@ -397,11 +397,11 @@ Through a visual interface, users can compose pipelines from predefined transfor
 This interactive layer lowers the barrier of entry for domain experts while preserving the expressive power and compositional semantics of the underlying DSL.
 
 From a software engineering perspective, Grafter can be classified as a \emph{functional embedded DSL} characterized by:
-\begin{itemize}
-    \item compositional transformation pipelines,
-    \item functional abstraction and immutability,
-    \item explicit dataflow modeling,
-    \item extensible operator libraries, and
+\begin{itemize}[label=-, noitemsep]
+    \item compositional transformation pipelines;
+    \item functional abstraction and immutability;
+    \item explicit dataflow modeling;
+    \item extensible operator libraries;
     \item integrated semantic data mapping.
 \end{itemize}
 This design makes Grafter particularly suitable for large-scale data transformation and semantic publishing workflows, while Grafterizer facilitates interactive development and validation of data cleaning logic.
@@ -456,11 +456,11 @@ Transformation expressions combine column references, functional operators, and 
 However, direct authoring of Wrangle scripts is intentionally restricted; instead, users construct recipes via interactive selection and manipulation, with the system generating the corresponding DSL code implicitly.
 
 From a software engineering perspective, Wrangle can be classified as a \emph{proprietary embedded DSL for data transformation pipelines} characterized by:
-\begin{itemize}
-    \item linear recipe-based pipeline structure,
-    \item operator-centric transformation semantics,
-    \item expression-based column and row selection,
-    \item integrated functional computation model, and
+\begin{itemize}[label=-, noitemsep]
+    \item linear recipe-based pipeline structure;
+    \item operator-centric transformation semantics;
+    \item expression-based column and row selection;
+    \item integrated functional computation model;
     \item tight coupling to a graphical interaction environment.
 \end{itemize}
 While this design significantly lowers the entry barrier for non-technical users, it also limits transparency, portability, and independent reuse of transformation logic outside the hosting platform.
@@ -496,31 +496,31 @@ Existing solutions for data cleaning and data quality management can be broadly 
 
 Non-DSL approaches, including visual modeling (e.g., UML-based quality assessment), interactive data transformation tools (e.g., Wrangler, Falcon, OpenRefine), enterprise platforms (e.g., IBM, Oracle, SAS), and SQL-based rule engines, primarily rely on either graphical interfaces, ad-hoc scripts, or embedded configurations to perform data cleaning and validation \cite{rahm2000data,wrangler,openrefine-site,falcon,quality-assessment-uml}. 
 These solutions offer several practical advantages:
-\begin{itemize}
-    \item Facilitate iterative and interactive cleaning processes.
-    \item Reduce manual effort for common data transformations.
-    \item Integrate with existing ETL pipelines and enterprise workflows.
+\begin{itemize}[label=-, noitemsep]
+    \item Facilitate iterative and interactive cleaning processes;
+    \item Reduce manual effort for common data transformations;
+    \item Integrate with existing ETL pipelines and enterprise workflows;
     \item Provide audit trails or histories of applied transformations.
 \end{itemize}
 However, they also exhibit significant limitations:
-\begin{itemize}
-    \item Data quality rules are often hidden, ad-hoc, or fragmented across queries, workflows, or GUI actions.
-    \item Lack of a formal, human-readable, and reusable specification of business-level quality rules.
+\begin{itemize}[label=-, noitemsep]
+    \item Data quality rules are often hidden, ad-hoc, or fragmented across queries, workflows, or GUI actions;
+    \item Lack of a formal, human-readable, and reusable specification of business-level quality rules;
     \item Limited support for automated validation and modular composition of rules.
 \end{itemize}
 
 DSL-based approaches, such as Jayvee \cite{jayvee} and Grafter/Grafterizer \cite{grafterizer}, introduce domain-specific abstractions for modeling pipelines and composable transformations. 
 They formalize aspects of data processing through explicit constructs, typed value systems, and built-in validation mechanisms. 
 The advantages of DSL-based solutions include:
-\begin{itemize}
-    \item Explicit and structured representation of transformations and dataflow.
-    \item Integrated constraint-based validation and semantic reasoning.
+\begin{itemize}[label=-, noitemsep]
+    \item Explicit and structured representation of transformations and dataflow;
+    \item Integrated constraint-based validation and semantic reasoning;
     \item Support for modular composition and reuse of processing units.
 \end{itemize}
 Their limitations include:
-\begin{itemize}
-    \item Steeper learning curve due to new languages and paradigms.
-    \item Focus on transformation pipelines rather than purely on data quality contracts.
+\begin{itemize}[label=-, noitemsep]
+    \item Steeper learning curve due to new languages and paradigms;
+    \item Focus on transformation pipelines rather than purely on data quality contracts;
     \item Smaller ecosystems compared to mature enterprise ETL platforms.
 \end{itemize}
 
@@ -535,18 +535,18 @@ This gap motivates the development of a dedicated DSL for data quality validatio
 
 Despite the diversity of existing solutions for data cleaning and data quality management, several limitations remain that motivate the development of a dedicated domain-specific language (DSL):
 
-\begin{enumerate}
-    \item \textbf{Lack of explicit, reusable rules:} Non-DSL tools often embed validation logic in GUI actions, scripts, or platform configurations, making it difficult to extract, audit, and reuse business-level data quality rules.
+\begin{itemize}[label=-, noitemsep]
+    \item \textbf{Lack of explicit, reusable rules:} Non-DSL tools often embed validation logic in GUI actions, scripts, or platform configurations, making it difficult to extract, audit, and reuse business-level data quality rules;
     
-    \item \textbf{Fragmented validation:} SQL-based and enterprise approaches frequently scatter checks across multiple queries, stored procedures, or pipelines, complicating maintenance, discoverability, and traceability.
+    \item \textbf{Fragmented validation:} SQL-based and enterprise approaches frequently scatter checks across multiple queries, stored procedures, or pipelines, complicating maintenance, discoverability, and traceability;
     
-    \item \textbf{Limited formal semantics:} Most visual or script-driven solutions do not provide formal semantics for transformations or data constraints, which hinders automated reasoning, error detection, and reproducibility.
+    \item \textbf{Limited formal semantics:} Most visual or script-driven solutions do not provide formal semantics for transformations or data constraints, which hinders automated reasoning, error detection, and reproducibility;
     
-    \item \textbf{Low modularity and composability:} Existing solutions often lack a mechanism for defining modular, composable transformations or quality rules that can be reused across datasets and projects.
+    \item \textbf{Low modularity and composability:} Existing solutions often lack a mechanism for defining modular, composable transformations or quality rules that can be reused across datasets and projects;
     
-    \item \textbf{High dependence on technical expertise:} Tools such as Falcon, Wrangler, and Grafter assume familiarity with SQL, functional programming, or pipeline modeling, which can exclude domain experts from participating directly in quality specification.
+    \item \textbf{High dependence on technical expertise:} Tools such as Falcon, Wrangler, and Grafter assume familiarity with SQL, functional programming, or pipeline modeling, which can exclude domain experts from participating directly in quality specification;
     
-    \item \textbf{Insufficient integration of semantic validation:} Only a few DSL-based approaches (e.g., Grafter) combine data cleaning with semantic or type-based validation, leaving a gap in end-to-end formalized data quality enforcement.
+    \item \textbf{Insufficient integration of semantic validation:} Only a few DSL-based approaches (e.g., Grafter) combine data cleaning with semantic or type-based validation, leaving a gap in end-to-end formalized data quality enforcement;
     
     \item \textbf{Steep learning curves and ecosystem limitations:} DSL-based solutions often require adoption of new languages and paradigms, and their smaller ecosystems make integration, tooling, and community support limited compared to mature enterprise platforms.
 \end{enumerate}
@@ -561,40 +561,40 @@ The Data Quality Validator DSL aims to provide a formal, expressive, and user-fr
 The functional requirements of the DSL can be grouped into the following categories:
 
 \subsection{Rule Definition and Specification}
-\begin{itemize}
-    \item \textbf{Declarative rule syntax:} Users should be able to express data quality rules in a clear, human-readable, and declarative form.
-    \item \textbf{Support for multiple data types:} The language must allow rules over standard types such as integers, decimals, strings, dates, and domain-specific types (e.g., percentages, IDs).
-    \item \textbf{Constraint specification:} Users can define constraints on values, ranges, formats, uniqueness, relationships between columns, and custom predicates.
+\begin{itemize}[label=-, noitemsep]
+    \item \textbf{Declarative rule syntax:} Users should be able to express data quality rules in a clear, human-readable, and declarative form;
+    \item \textbf{Support for multiple data types:} The language must allow rules over standard types such as integers, decimals, strings, dates, and domain-specific types (e.g., percentages, IDs);
+    \item \textbf{Constraint specification:} Users can define constraints on values, ranges, formats, uniqueness, relationships between columns, and custom predicates;
     \item \textbf{Composite rules:} The DSL should support composing multiple simple rules into complex, reusable rulesets.
 \end{itemize}
 
 \subsection{Validation and Execution}
-\begin{itemize}
-    \item \textbf{Table-level validation:} The DSL must allow rules to be applied over entire tables or datasets.
-    \item \textbf{Row-level and column-level checks:} Users can define rules that operate at granular levels (per row, per column, or across multiple columns).
-    \item \textbf{Deterministic evaluation:} Rule execution should produce deterministic results, ensuring reproducibility.
-    \item \textbf{Error reporting and diagnostics:} The system must provide clear feedback on violations, including location (row/column) and the rule that failed.
+\begin{itemize}[label=-, noitemsep]
+    \item \textbf{Table-level validation:} The DSL must allow rules to be applied over entire tables or datasets;
+    \item \textbf{Row-level and column-level checks:} Users can define rules that operate at granular levels (per row, per column, or across multiple columns);
+    \item \textbf{Deterministic evaluation:} Rule execution should produce deterministic results, ensuring reproducibility;
+    \item \textbf{Error reporting and diagnostics:} The system must provide clear feedback on violations, including location (row/column) and the rule that failed;
     \item \textbf{Batch and incremental validation:} The DSL should support validating historical datasets as well as streaming or newly appended data.
 \end{itemize}
 
 \subsection{Modularity and Reusability}
-\begin{itemize}
-    \item \textbf{Reusable rule libraries:} Users should be able to define, store, and reuse commonly applied rules across datasets and projects.
-    \item \textbf{Parameterized rules:} The language should allow parameterization to apply the same logic to different columns, tables, or datasets without rewriting rules.
+\begin{itemize}[label=-, noitemsep]
+    \item \textbf{Reusable rule libraries:} Users should be able to define, store, and reuse commonly applied rules across datasets and projects;
+    \item \textbf{Parameterized rules:} The language should allow parameterization to apply the same logic to different columns, tables, or datasets without rewriting rules;
     \item \textbf{Rule grouping and categorization:} Rules can be grouped by domain, dataset, or quality attribute for easier management and auditing.
 \end{itemize}
 
 \subsection{Integration and Extensibility}
-\begin{itemize}
-    \item \textbf{Database connectivity:} The DSL must support reading from and writing to relational databases (e.g., SQL-based systems) and potentially flat files (CSV, JSON).
-    \item \textbf{Extensible functions and predicates:} Users can define custom functions or predicates to handle specialized validation logic.
+\begin{itemize}[label=-, noitemsep]
+    \item \textbf{Database connectivity:} The DSL must support reading from and writing to relational databases (e.g., SQL-based systems) and potentially flat files (CSV, JSON);
+    \item \textbf{Extensible functions and predicates:} Users can define custom functions or predicates to handle specialized validation logic;
     \item \textbf{Interoperability:} Rulesets can be exported, imported, or integrated with existing ETL pipelines and monitoring systems.
 \end{itemize}
 
 \subsection{Usability and Accessibility}
-\begin{itemize}
-    \item \textbf{Readable syntax:} Rule expressions should be intuitive to domain experts with minimal programming background.
-    \item \textbf{Interactive development support:} Optional support for IDE-like features, auto-completion, and inline validation to facilitate rule creation.
+\begin{itemize}[label=-, noitemsep]
+    \item \textbf{Readable syntax:} Rule expressions should be intuitive to domain experts with minimal programming background;
+    \item \textbf{Interactive development support:} Optional support for IDE-like features, auto-completion, and inline validation to facilitate rule creation;
     \item \textbf{Auditability:} All rule definitions, executions, and violations should be logged for auditing and compliance purposes.
 \end{itemize}
 

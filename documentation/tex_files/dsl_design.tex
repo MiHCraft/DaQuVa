@@ -6,10 +6,10 @@ DaQuVa (Data Quality Validator) is a domain-specific language designed to facili
 The DSL is tailored for post-validation data cleaning in enormous databases, where data has already undergone initial validation but may still contain inconsistencies, duplicates, or errors. DaQuVa ensures cautious operations by incorporating confidence-based scoring (e.g., dirty\_level, duplicate\_score) and explicit safety mechanisms (e.g., Here() with allowDanger) to prevent accidental data loss.
 
 Key design principles include:
-\begin{itemize}
-    \item \textbf{Declarative Nature}: Users describe data transformations and validations without specifying low-level implementation details.
-    \item \textbf{Safety-First}: Destructive operations require explicit thresholds and permissions.
-    \item \textbf{Reusability}: Support for variables and functions to enable modular, pipeline-friendly scripts.
+\begin{itemize}[label=-, noitemsep]
+    \item \textbf{Declarative Nature}: Users describe data transformations and validations without specifying low-level implementation details;
+    \item \textbf{Safety-First}: Destructive operations require explicit thresholds and permissions;
+    \item \textbf{Reusability}: Support for variables and functions to enable modular, pipeline-friendly scripts;
     \item \textbf{Extensibility}: Architecture allows integration of AI-based or rule-based tools for validation.
 \end{itemize}
 
@@ -41,12 +41,12 @@ be exported and verified at a glance.
 
 The grammar of DaQuVa is guided by three principles:
 
-\begin{enumerate}[noitemsep]
+\begin{itemize}[label=-, noitemsep]
     \item \textbf{Readability.} Statements read like short English instructions
-          (\texttt{scan table."col" using tool "name"}).
+          (\texttt{scan table."col" using tool "name"});
     \item \textbf{Minimalism.} Only constructs required for data-quality tasks
           are included; general-purpose programming facilities are deliberately
-          omitted.
+          omitted;
     \item \textbf{Safety by default.} Destructive operations on the underlying
           database require an explicit \texttt{allowDanger} flag, making
           accidental data modification syntactically impossible.
@@ -141,13 +141,13 @@ characters and does not assign semantic meaning to indentation.
 
 The following rules apply:
 
-\begin{itemize}[noitemsep]
-    \item One or more whitespace characters may appear between tokens
-          to separate them.
-    \item Consecutive spaces are treated as a single separator.
-    \item Tab characters and newline characters are ignored by the parser.
+\begin{itemize}[label=-, noitemsep]
+  \item One or more whitespace characters may appear between tokens
+          to separate them;
+    \item Consecutive spaces are treated as a single separator;
+    \item Tab characters and newline characters are ignored by the parser;
     \item Program structure is defined by explicit punctuation rather than
-          indentation.
+          indentation;
     \item The semicolon (\texttt{;}) is the only required statement
           terminator and separates commands.
 \end{itemize}
@@ -459,11 +459,11 @@ element.
 A DaQuVa program is a flat sequence of statements with no required entry-point.
 Execution proceeds top-to-bottom. There are four statement kinds:
 
-\begin{itemize}[noitemsep]
-    \item \textbf{Database initialisation} (\texttt{my\_db}): establishes the
-          active connection.
-    \item \textbf{Variable assignment}: binds the result of a command to a name.
-    \item \textbf{Function definition}: introduces a named, reusable routine.
+\begin{itemize}[label=-, noitemsep]
+  \item \textbf{Database initialisation} (\texttt{my\_db}): establishes the
+          active connection;
+    \item \textbf{Variable assignment}: binds the result of a command to a name;
+    \item \textbf{Function definition}: introduces a named, reusable routine;
     \item \textbf{Command statement}: executes an action without binding.
 \end{itemize}
 
@@ -493,9 +493,9 @@ top level; there is no nested function definition or recursion.
 DaQuVa programs execute \emph{sequentially}. Each statement is fully evaluated
 before the next begins. The runtime maintains:
 
-\begin{enumerate}[noitemsep]
-    \item A single \textbf{database context} set by \texttt{my\_db}.
-    \item A \textbf{variable environment} mapping names to result sets.
+\begin{itemize}[label=-, noitemsep]
+  \item A single \textbf{database context} set by \texttt{my\_db};
+    \item A \textbf{variable environment} mapping names to result sets;
     \item A \textbf{function table} mapping names to parameter lists and
           statement blocks.
 \end{enumerate}
@@ -574,10 +574,10 @@ dirtiness. The result is an annotated copy of the rows with the added
 meta-column.
 
 \textbf{Execution.}
-\begin{enumerate}[noitemsep]
-    \item Resolve the table name against the active database context.
-    \item Resolve the tool name against the registered tool registry.
-    \item Invoke the tool for each row value in the column.
+\begin{itemize}[label=-, noitemsep]
+  \item Resolve the table name against the active database context;
+    \item Resolve the tool name against the registered tool registry;
+    \item Invoke the tool for each row value in the column;
     \item Return a result set containing all original columns plus
           \texttt{dirty\_level}.
 \end{enumerate}
@@ -711,10 +711,10 @@ only duplicate pairs with \texttt{duplicate\_score} $\geq$ threshold are
 merged.
 
 \textbf{Execution.}
-\begin{enumerate}[noitemsep]
-    \item Filter candidates by the confidence threshold (default: 0).
+\begin{itemize}[label=-, noitemsep]
+  \item Filter candidates by the confidence threshold (default: 0);
     \item For each qualifying pair, apply a deterministic merge strategy
-          (e.g.\ keep the most complete record).
+          (e.g.\ keep the most complete record);
     \item Write merged records to the database; delete superseded records.
 \end{enumerate}
 
@@ -733,10 +733,10 @@ database modifications opt-in and visible in code review.
 (standard output), a named file, or the live database via \texttt{Here()}.
 
 \textbf{Execution.}
-\begin{itemize}[noitemsep]
-    \item \texttt{console} --- serialises rows as human-readable text.
+\begin{itemize}[label=-, noitemsep]
+  \item \texttt{console} --- serialises rows as human-readable text;
     \item \texttt{file "<path>"} --- writes rows to the specified file path in
-          a delimited format (e.g.\ CSV).
+          a delimited format (e.g.\ CSV);
     \item \texttt{Here()} --- inserts or upserts rows into the database.
 \end{itemize}
 

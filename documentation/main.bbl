@@ -32,28 +32,12 @@ Kandel, S.; Paepcke, A.; et al. Wrangler: Interactive Visual Specification of
   \doi{10.1145/1978942.1979444}.
 \urlprefix\biburl{https://idl.cs.washington.edu/files/2011-Wrangler-CHI.pdf}
 
-\bibitem{quality-assessment-uml}
-Langer, P.; Kappel, G.; et al. Quality Assessment and Quality Improvement for
-  UML Models. \emph{Software and Systems Modeling}, volume~13, no.~2, 2014: pp.
-  571--594.
-\urlprefix\biburl{https://www.swe.informatik.uni-goettingen.de/publications/quality-assessment-and-quality-improvement-uml-models}
-
-\bibitem{wrangler}
-Kandel, S.; Paepcke, A.; et al. Wrangler: Interactive Visual Specification of
-  Data Transformation Scripts. In \emph{Proceedings of the SIGCHI Conference on
-  Human Factors in Computing Systems}, ACM, 2011, pp. 3363--3372.
-\urlprefix\biburl{http://vis.stanford.edu/files/2011-Wrangler-CHI.pdf}
-
-\bibitem{falcon}
-Yakout, M.; Ouzzani, M.; et al. Interactive and Deterministic Data Cleaning. In
-  \emph{Proceedings of the 2016 International Conference on Management of Data
-  (SIGMOD)}, ACM, 2016, pp. 1205--1217.
-\urlprefix\biburl{https://dl.acm.org/doi/10.1145/2882903.2915242}
-
-\bibitem{openrefine-site}
-{OpenRefine Community}. OpenRefine. 2012, open-source tool for cleaning and
-  transforming messy data.
-\urlprefix\biburl{https://openrefine.org/}
+\bibitem{iso25012}
+{International Organization for Standardization}. ISO/IEC 25012:2008 ---
+  Software Engineering --- Software Product Quality Requirements and Evaluation
+  (SQuaRE) --- Data Quality Model. Technical report ISO/IEC 25012:2008,
+  ISO/IEC, 2008.
+\urlprefix\biburl{https://www.iso.org/standard/35736.html}
 
 \bibitem{dsl-empirical-2025}
 Heltweg, P.; Schwarz, G.-D.; et al. Can a Domain-Specific Language Improve
@@ -61,10 +45,45 @@ Heltweg, P.; Schwarz, G.-D.; et al. Can a Domain-Specific Language Improve
   2025, arXiv:2505.16764 [cs.PL].
 \urlprefix\biburl{https://arxiv.org/abs/2505.16764}
 
+\bibitem{wrangler}
+Kandel, S.; Paepcke, A.; et al. Wrangler: Interactive Visual Specification of
+  Data Transformation Scripts. In \emph{Proceedings of the SIGCHI Conference on
+  Human Factors in Computing Systems}, ACM, 2011, pp. 3363--3372.
+\urlprefix\biburl{http://vis.stanford.edu/files/2011-Wrangler-CHI.pdf}
+
+\bibitem{nadeef}
+Dallachiesa, M.; Ebaid, A.; et al. NADEEF: A Commodity Data Cleaning System. In
+  \emph{Proceedings of the 2013 ACM SIGMOD International Conference on
+  Management of Data}, ACM, 2013, pp. 541--552, \doi{10.1145/2463676.2465327}.
+\urlprefix\biburl{https://doi.org/10.1145/2463676.2465327}
+
+\bibitem{holoclean}
+Rekatsinas, T.; Chu, X.; et al. HoloClean: Holistic Data Repairs with
+  Probabilistic Inference. \emph{Proceedings of the VLDB Endowment}, volume~10,
+  no.~11, 2017: pp. 1190--1201, \doi{10.14778/3137628.3137631}.
+\urlprefix\biburl{https://doi.org/10.14778/3137628.3137631}
+
+\bibitem{falcon}
+Yakout, M.; Ouzzani, M.; et al. Interactive and Deterministic Data Cleaning. In
+  \emph{Proceedings of the 2016 International Conference on Management of Data
+  (SIGMOD)}, ACM, 2016, pp. 1205--1217.
+\urlprefix\biburl{https://dl.acm.org/doi/10.1145/2882903.2915242}
+
 \bibitem{jayvee}
 {Friedrich-Alexander Universität Erlangen-Nürnberg}. Jayvee: A
   Domain-Specific Language for Data Pipelines. 2026, accessed: 2026-02-14.
 \urlprefix\biburl{https://jvalue.github.io/jayvee/}
+
+\bibitem{quality-assessment-uml}
+Langer, P.; Kappel, G.; et al. Quality Assessment and Quality Improvement for
+  UML Models. \emph{Software and Systems Modeling}, volume~13, no.~2, 2014: pp.
+  571--594.
+\urlprefix\biburl{https://www.swe.informatik.uni-goettingen.de/publications/quality-assessment-and-quality-improvement-uml-models}
+
+\bibitem{openrefine-site}
+{OpenRefine Community}. OpenRefine. 2012, open-source tool for cleaning and
+  transforming messy data.
+\urlprefix\biburl{https://openrefine.org/}
 
 \bibitem{grafterizer}
 Sukhobok, D.; Nikolov, N.; et al. Tabular Data Cleaning and Linked Data

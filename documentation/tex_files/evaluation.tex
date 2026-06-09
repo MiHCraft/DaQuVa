@@ -10,8 +10,8 @@ tables can be inspected directly.
 
 The existing demo set validates the main pipeline operations:
 
-\begin{itemize}
-    \item scanning input tables and annotating rows with tool-generated
+\begin{itemize}[label=-, noitemsep]
+      \item scanning input tables and annotating rows with tool-generated
           metadata;
     \item filtering by numeric thresholds and string values;
     \item detecting potential duplicates and merging duplicate groups;
@@ -47,16 +47,16 @@ contains \texttt{allowDanger}.
 
 Several implementation fixes improve the reliability of the evaluator:
 
-\begin{itemize}
-    \item CSV string cells are normalized by stripping surrounding whitespace,
-          which makes equality filters behave consistently.
+\begin{itemize}[label=-, noitemsep]
+      \item CSV string cells are normalized by stripping surrounding whitespace,
+          which makes equality filters behave consistently;
     \item Filters that reference unknown columns now raise an explicit error
-          with the available column names.
+          with the available column names;
     \item Ordered comparisons against incompatible non-numeric values now
           produce a clear \texttt{ValueError} instead of an unhandled Python
-          exception.
+          exception;
     \item The Levenshtein duplicate matcher short-circuits row pairs whose
-          length difference already exceeds the configured distance threshold.
+          length difference already exceeds the configured distance threshold;
     \item SQLite replacement writes use a temporary table and atomic rename
           pattern, reducing the risk of losing existing data if table creation
           fails.

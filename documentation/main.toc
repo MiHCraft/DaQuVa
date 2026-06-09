@@ -4,93 +4,102 @@
 \contentsline {chapter}{\numberline {1}Domain Analysis}{6}{chapter.1}%
 \contentsline {section}{\numberline {1.1}Problem statement}{6}{section.1.1}%
 \contentsline {section}{\numberline {1.2}Motivation and need for DSL}{6}{section.1.2}%
-\contentsline {section}{\numberline {1.3}Target Audience}{6}{section.1.3}%
-\contentsline {section}{\numberline {1.4}Existing solutions analysis}{6}{section.1.4}%
-\contentsline {subsection}{\numberline {1.4.1}Non-DSL solutions}{6}{subsection.1.4.1}%
-\contentsline {paragraph}{Visual modeling and UML-based quality approaches.}{6}{paragraph*.4}%
-\contentsline {paragraph}{Interactive visual data transformation tools (Wrangler).}{6}{paragraph*.6}%
-\contentsline {paragraph}{Interactive and deterministic data repair (Falcon).}{7}{paragraph*.8}%
-\contentsline {paragraph}{General-purpose interactive cleaning tools (OpenRefine).}{7}{paragraph*.10}%
-\contentsline {paragraph}{Enterprise data quality platforms.}{8}{paragraph*.12}%
-\contentsline {paragraph}{SQL-based rule engines and database-centric checks.}{8}{paragraph*.14}%
-\contentsline {paragraph}{Data profiling and catalog tools with quality rules.}{9}{paragraph*.16}%
-\contentsline {paragraph}{Self-service analytics tools with built-in validation.}{9}{paragraph*.18}%
-\contentsline {paragraph}{Summary}{10}{paragraph*.20}%
-\contentsline {subsection}{\numberline {1.4.2}Existing DSL solutions}{10}{subsection.1.4.2}%
-\contentsline {paragraph}{Grafter and Grafterizer.}{11}{paragraph*.22}%
-\contentsline {paragraph}{Wrangle (Trifacta / Alteryx).}{13}{paragraph*.24}%
-\contentsline {section}{\numberline {1.5}Summary of Existing Solutions}{14}{section.1.5}%
-\contentsline {section}{\numberline {1.6}Identified Gaps}{15}{section.1.6}%
-\contentsline {paragraph}{}{16}{paragraph*.26}%
-\contentsline {section}{\numberline {1.7}Functional Requirements}{16}{section.1.7}%
-\contentsline {subsection}{\numberline {1.7.1}Rule Definition and Specification}{16}{subsection.1.7.1}%
-\contentsline {subsection}{\numberline {1.7.2}Validation and Execution}{16}{subsection.1.7.2}%
-\contentsline {subsection}{\numberline {1.7.3}Modularity and Reusability}{17}{subsection.1.7.3}%
-\contentsline {subsection}{\numberline {1.7.4}Integration and Extensibility}{17}{subsection.1.7.4}%
-\contentsline {subsection}{\numberline {1.7.5}Usability and Accessibility}{17}{subsection.1.7.5}%
-\contentsline {section}{\numberline {1.8}Proposed Solution Overview}{17}{section.1.8}%
-\contentsline {paragraph}{Example: Column-level validation}{17}{paragraph*.27}%
-\contentsline {paragraph}{Example: Cross-column rule}{18}{paragraph*.28}%
-\contentsline {paragraph}{Example: Referential integrity check}{18}{paragraph*.29}%
-\contentsline {paragraph}{Example: Reusable rule definition}{18}{paragraph*.30}%
-\contentsline {section}{\numberline {1.9}Use Cases}{18}{section.1.9}%
-\contentsline {paragraph}{1. Batch validation of datasets}{18}{paragraph*.31}%
-\contentsline {paragraph}{2. Incremental validation for streaming data}{19}{paragraph*.32}%
-\contentsline {paragraph}{3. Aggregated checks and group-level rules}{19}{paragraph*.33}%
-\contentsline {paragraph}{4. Logging and auditing}{19}{paragraph*.34}%
-\contentsline {paragraph}{}{19}{paragraph*.35}%
-\contentsline {chapter}{\numberline {2}DaQuVa DSL: Language Design}{20}{chapter.2}%
-\contentsline {section}{\numberline {2.1}Introduction to DaQuVa DSL Design}{20}{section.2.1}%
-\contentsline {section}{\numberline {2.2}Initial DSL Grammar}{20}{section.2.2}%
-\contentsline {subsection}{\numberline {2.2.1}Design Principles}{20}{subsection.2.2.1}%
-\contentsline {subsection}{\numberline {2.2.2}Lexical Elements}{20}{subsection.2.2.2}%
-\contentsline {subsubsection}{Keywords}{20}{subsubsection*.36}%
-\contentsline {subsubsection}{Identifiers}{21}{subsubsection*.38}%
-\contentsline {subsubsection}{Literals}{21}{subsubsection*.39}%
-\contentsline {subsubsection}{Comments}{21}{subsubsection*.40}%
-\contentsline {subsubsection}{Whitespace and Layout}{21}{subsubsection*.41}%
-\contentsline {subsubsection}{Operators and Punctuation}{22}{subsubsection*.42}%
-\contentsline {subsection}{\numberline {2.2.3}Syntactic Grammar in BNF}{23}{subsection.2.2.3}%
-\contentsline {subsection}{\numberline {2.2.4}Core Syntactic Structures}{30}{subsection.2.2.4}%
-\contentsline {subsubsection}{Program and Statements}{30}{subsubsection*.44}%
-\contentsline {subsubsection}{Expressions and Conditions}{30}{subsubsection*.45}%
-\contentsline {subsubsection}{Functions}{30}{subsubsection*.46}%
-\contentsline {section}{\numberline {2.3}Basic DSL Semantics}{30}{section.2.3}%
-\contentsline {subsection}{\numberline {2.3.1}Execution Model}{30}{subsection.2.3.1}%
-\contentsline {subsection}{\numberline {2.3.2}Semantic Description of Core Constructs}{30}{subsection.2.3.2}%
-\contentsline {subsection}{\numberline {2.3.3}Command Semantics}{31}{subsection.2.3.3}%
-\contentsline {subsubsection}{\texttt {scan} --- Column Validation}{31}{subsubsection*.48}%
-\contentsline {subsubsection}{\texttt {filter} --- Threshold Filtering}{32}{subsubsection*.49}%
-\contentsline {subsubsection}{\texttt {findLocalDuplicates} --- Duplicate Detection}{32}{subsubsection*.50}%
-\contentsline {subsubsection}{\texttt {merge} --- Duplicate Resolution}{32}{subsubsection*.51}%
-\contentsline {subsubsection}{\texttt {output} --- Result Export}{33}{subsubsection*.52}%
-\contentsline {subsubsection}{\texttt {newTable} --- Table Construction}{33}{subsubsection*.53}%
-\contentsline {subsubsection}{\texttt {function} and Function Calls}{33}{subsubsection*.54}%
-\contentsline {subsection}{\numberline {2.3.4}Error Catalogue}{34}{subsection.2.3.4}%
-\contentsline {section}{\numberline {2.4}Illustrative Example Program}{34}{section.2.4}%
-\contentsline {section}{\numberline {2.5}Derivation Trees for Control Structures}{36}{section.2.5}%
-\contentsline {subsection}{\numberline {2.5.1}Variable Definition}{36}{subsection.2.5.1}%
-\contentsline {subsection}{\numberline {2.5.2}scan Command}{36}{subsection.2.5.2}%
-\contentsline {subsection}{\numberline {2.5.3}filter Command}{36}{subsection.2.5.3}%
-\contentsline {subsection}{\numberline {2.5.4}Function Definition}{37}{subsection.2.5.4}%
-\contentsline {subsection}{\numberline {2.5.5}merge Command}{37}{subsection.2.5.5}%
-\contentsline {subsection}{\numberline {2.5.6}output Command}{37}{subsection.2.5.6}%
-\contentsline {subsection}{\numberline {2.5.7}findLocalDuplicates Command}{37}{subsection.2.5.7}%
-\contentsline {subsection}{\numberline {2.5.8}newTable Command}{38}{subsection.2.5.8}%
-\contentsline {section}{\numberline {2.6}Summary}{38}{section.2.6}%
-\contentsline {chapter}{\numberline {3}DSL Implementation}{39}{chapter.3}%
-\contentsline {section}{\numberline {3.1}Lexer}{39}{section.3.1}%
-\contentsline {section}{\numberline {3.2}Parser}{41}{section.3.2}%
-\contentsline {section}{\numberline {3.3}execution engine}{42}{section.3.3}%
-\contentsline {chapter}{\numberline {4}Evaluation \& Experiments}{43}{chapter.4}%
-\contentsline {section}{\numberline {4.1}Experimant 1}{43}{section.4.1}%
-\contentsline {section}{\numberline {4.2}Experimant 2}{43}{section.4.2}%
-\contentsline {chapter}{\numberline {5}Discussion}{44}{chapter.5}%
-\contentsline {section}{\numberline {5.1}What was good}{44}{section.5.1}%
-\contentsline {section}{\numberline {5.2}What comes to be bad}{44}{section.5.2}%
-\contentsline {chapter}{Conclusions}{45}{section.5.2}%
-\contentsline {chapter}{\numberline {A}Appendix}{46}{appendix.A}%
-\contentsline {section}{\numberline {A.1}PBL Problem Map}{47}{section.A.1}%
-\contentsline {section}{\numberline {A.2}Project Plan}{51}{section.A.2}%
-\contentsline {section}{\numberline {A.3}Team Contract}{52}{section.A.3}%
-\contentsline {chapter}{Bibliography}{53}{section*.57}%
+\contentsline {section}{\numberline {1.3}Target Audience}{7}{section.1.3}%
+\contentsline {section}{\numberline {1.4}Existing solutions analysis}{8}{section.1.4}%
+\contentsline {subsection}{\numberline {1.4.1}Non-DSL solutions}{8}{subsection.1.4.1}%
+\contentsline {paragraph}{Visual modeling and UML-based quality approaches.}{8}{paragraph*.4}%
+\contentsline {paragraph}{Interactive visual data transformation tools (Wrangler).}{8}{paragraph*.6}%
+\contentsline {paragraph}{Interactive and deterministic data repair (Falcon).}{8}{paragraph*.8}%
+\contentsline {paragraph}{General-purpose interactive cleaning tools (OpenRefine).}{9}{paragraph*.10}%
+\contentsline {paragraph}{Enterprise data quality platforms.}{9}{paragraph*.12}%
+\contentsline {paragraph}{SQL-based rule engines and database-centric checks.}{10}{paragraph*.14}%
+\contentsline {paragraph}{Data profiling and catalog tools with quality rules.}{10}{paragraph*.16}%
+\contentsline {paragraph}{Self-service analytics tools with built-in validation.}{10}{paragraph*.18}%
+\contentsline {paragraph}{Summary}{11}{paragraph*.20}%
+\contentsline {subsection}{\numberline {1.4.2}Existing DSL solutions}{12}{subsection.1.4.2}%
+\contentsline {paragraph}{Grafter and Grafterizer.}{13}{paragraph*.22}%
+\contentsline {paragraph}{Wrangle (Trifacta / Alteryx).}{14}{paragraph*.24}%
+\contentsline {section}{\numberline {1.5}Summary of Existing Solutions}{15}{section.1.5}%
+\contentsline {section}{\numberline {1.6}Identified Gaps}{17}{section.1.6}%
+\contentsline {paragraph}{}{17}{paragraph*.26}%
+\contentsline {section}{\numberline {1.7}Functional Requirements}{18}{section.1.7}%
+\contentsline {subsection}{\numberline {1.7.1}Rule Definition and Specification}{18}{subsection.1.7.1}%
+\contentsline {subsection}{\numberline {1.7.2}Validation and Execution}{18}{subsection.1.7.2}%
+\contentsline {subsection}{\numberline {1.7.3}Modularity and Reusability}{18}{subsection.1.7.3}%
+\contentsline {subsection}{\numberline {1.7.4}Integration and Extensibility}{18}{subsection.1.7.4}%
+\contentsline {subsection}{\numberline {1.7.5}Usability and Accessibility}{19}{subsection.1.7.5}%
+\contentsline {section}{\numberline {1.8}Proposed Solution Overview}{19}{section.1.8}%
+\contentsline {paragraph}{Example: Column-level validation}{19}{paragraph*.27}%
+\contentsline {paragraph}{Example: Cross-column rule}{19}{paragraph*.28}%
+\contentsline {paragraph}{Example: Referential integrity check}{19}{paragraph*.29}%
+\contentsline {paragraph}{Example: Reusable rule definition}{20}{paragraph*.30}%
+\contentsline {section}{\numberline {1.9}Use Cases}{20}{section.1.9}%
+\contentsline {paragraph}{1. Batch validation of datasets}{20}{paragraph*.31}%
+\contentsline {paragraph}{2. Incremental validation for streaming data}{20}{paragraph*.32}%
+\contentsline {paragraph}{3. Aggregated checks and group-level rules}{21}{paragraph*.33}%
+\contentsline {paragraph}{4. Logging and auditing}{21}{paragraph*.34}%
+\contentsline {paragraph}{}{21}{paragraph*.35}%
+\contentsline {chapter}{\numberline {2}DaQuVa DSL: Language Design}{22}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Introduction to DaQuVa DSL Design}{22}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Initial DSL Grammar}{22}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}Design Principles}{22}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.2}Lexical Elements}{23}{subsection.2.2.2}%
+\contentsline {subsubsection}{Keywords}{23}{subsubsection*.36}%
+\contentsline {subsubsection}{Identifiers}{23}{subsubsection*.38}%
+\contentsline {subsubsection}{Literals}{23}{subsubsection*.39}%
+\contentsline {subsubsection}{Comments}{24}{subsubsection*.40}%
+\contentsline {subsubsection}{Whitespace and Layout}{24}{subsubsection*.41}%
+\contentsline {subsubsection}{Operators and Punctuation}{24}{subsubsection*.42}%
+\contentsline {subsection}{\numberline {2.2.3}Syntactic Grammar in BNF}{25}{subsection.2.2.3}%
+\contentsline {subsection}{\numberline {2.2.4}Core Syntactic Structures}{32}{subsection.2.2.4}%
+\contentsline {subsubsection}{Program and Statements}{32}{subsubsection*.44}%
+\contentsline {subsubsection}{Expressions and Conditions}{33}{subsubsection*.45}%
+\contentsline {subsubsection}{Functions}{33}{subsubsection*.46}%
+\contentsline {section}{\numberline {2.3}Basic DSL Semantics}{33}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}Execution Model}{33}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.3.2}Semantic Description of Core Constructs}{33}{subsection.2.3.2}%
+\contentsline {subsection}{\numberline {2.3.3}Command Semantics}{34}{subsection.2.3.3}%
+\contentsline {subsubsection}{\texttt {scan} --- Column Validation}{34}{subsubsection*.48}%
+\contentsline {subsubsection}{\texttt {filter} --- Boolean and String Filtering}{35}{subsubsection*.49}%
+\contentsline {subsubsection}{\texttt {sort} and \texttt {limit} --- Result-Set Ordering}{35}{subsubsection*.50}%
+\contentsline {subsubsection}{\texttt {summarize} --- Aggregate Proof Summary}{36}{subsubsection*.51}%
+\contentsline {subsubsection}{\texttt {findLocalDuplicates} --- Duplicate Detection}{36}{subsubsection*.52}%
+\contentsline {subsubsection}{\texttt {merge} --- Duplicate Resolution}{37}{subsubsection*.53}%
+\contentsline {subsubsection}{\texttt {output} --- Result Export}{37}{subsubsection*.54}%
+\contentsline {subsubsection}{\texttt {newTable} --- Table Construction}{37}{subsubsection*.55}%
+\contentsline {subsubsection}{\texttt {function} and Function Calls}{38}{subsubsection*.56}%
+\contentsline {subsection}{\numberline {2.3.4}Error Catalogue}{38}{subsection.2.3.4}%
+\contentsline {section}{\numberline {2.4}Illustrative Example Program}{39}{section.2.4}%
+\contentsline {section}{\numberline {2.5}Derivation Trees for Control Structures}{40}{section.2.5}%
+\contentsline {subsection}{\numberline {2.5.1}Variable Definition}{40}{subsection.2.5.1}%
+\contentsline {subsection}{\numberline {2.5.2}scan Command}{41}{subsection.2.5.2}%
+\contentsline {subsection}{\numberline {2.5.3}filter Command}{41}{subsection.2.5.3}%
+\contentsline {subsection}{\numberline {2.5.4}Function Definition}{41}{subsection.2.5.4}%
+\contentsline {subsection}{\numberline {2.5.5}merge Command}{42}{subsection.2.5.5}%
+\contentsline {subsection}{\numberline {2.5.6}output Command}{42}{subsection.2.5.6}%
+\contentsline {subsection}{\numberline {2.5.7}findLocalDuplicates Command}{42}{subsection.2.5.7}%
+\contentsline {subsection}{\numberline {2.5.8}newTable Command}{42}{subsection.2.5.8}%
+\contentsline {section}{\numberline {2.6}Summary}{43}{section.2.6}%
+\contentsline {chapter}{\numberline {3}DSL Implementation}{44}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Lexer}{44}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Parser}{46}{section.3.2}%
+\contentsline {section}{\numberline {3.3}AST}{47}{section.3.3}%
+\contentsline {section}{\numberline {3.4}Semantic Analysis and Runtime}{51}{section.3.4}%
+\contentsline {section}{\numberline {3.5}Execution Engine}{51}{section.3.5}%
+\contentsline {section}{\numberline {3.6}Interactive REPL}{52}{section.3.6}%
+\contentsline {section}{\numberline {3.7}Showcase Demo}{52}{section.3.7}%
+\contentsline {chapter}{\numberline {4}Evaluation \& Experiments}{54}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Experiment 1: Core Data Quality Pipeline}{54}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Experiment 2: Latest Language Features}{54}{section.4.2}%
+\contentsline {section}{\numberline {4.3}Experiment 3: Robustness and Correctness Checks}{54}{section.4.3}%
+\contentsline {section}{\numberline {4.4}Experiment 4: Interactive Use}{55}{section.4.4}%
+\contentsline {section}{\numberline {4.5}Experiment 5: Input/Output Proof Summary}{55}{section.4.5}%
+\contentsline {chapter}{\numberline {5}Discussion}{57}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Strengths of the Current Prototype}{57}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Limitations and Future Work}{57}{section.5.2}%
+\contentsline {chapter}{Conclusions}{58}{section.5.2}%
+\contentsline {chapter}{\numberline {A}Appendix}{59}{appendix.A}%
+\contentsline {section}{\numberline {A.1}PBL Problem Map}{60}{section.A.1}%
+\contentsline {section}{\numberline {A.2}Project Plan}{64}{section.A.2}%
+\contentsline {section}{\numberline {A.3}Team Contract}{65}{section.A.3}%
+\contentsline {chapter}{Bibliography}{66}{section*.60}%
