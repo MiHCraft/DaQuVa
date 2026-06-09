@@ -18,15 +18,19 @@ DaQuVa source
 
 - SQLite and CSV connections
 - lazy `scan`
-- lazy `filter`
+- lazy `filter` with compound `AND` / `OR` conditions (`AND` binds tighter than `OR`)
+- string predicates `starts_with`, `contains`, `ends_with`
+- result-set ordering with `sort` and row capping with `limit`
 - CSV output
 - SQLite output/save
 - simple row and column edits
-- fuzzy duplicate detection
+- fuzzy duplicate detection (also available as the `levenshtein_matcher` alias)
 - typo detection with deterministic Levenshtein/domain heuristics
 - duplicate-aware `merge`, valid only after `find_duplicates`
-- SQL pushdown for simple SQLite scan/filter/project chains
+- `summarize`, an aggregate proof table of row counts per pipeline stage
+- SQL pushdown for simple SQLite scan/filter/project/sort/limit chains
 - Python execution for semantic tools such as typo and duplicate detection
+- an interactive REPL (`--repl`) for incremental, statement-by-statement use
 
 Future ideas such as joins, relation restoration, causal inference, distributed execution, and advanced optimization are intentionally out of scope for this MVP.
 
@@ -63,6 +67,8 @@ daquva/
   runtime.py
   execution_engine.py
   table.py
+  cli.py
+  repl.py
   tools/
     fuzzy_duplicates.py
     typo_detector.py
@@ -83,6 +89,10 @@ demo/
   demo_05_sqlite_output/
   demo_06_pipeline/
   demo_07_multiple_sources/
+  demo_08_functions/
+  demo_showcase/
+
+present.ps1
 ```
 
 The parser only creates AST nodes. `Table` only stores immutable logical plans and schema metadata. `ExecutionEngine` is the only layer that fetches rows.
@@ -136,6 +146,24 @@ You can also call the compatibility entry file:
 uv run python main.py path/to/program.dqv
 ```
 
+## Interactive REPL
+
+Start a persistent session (omit the file, or pass `--repl`):
+
+```bash
+uv run python -m daquva --repl
+```
+
+The REPL keeps one runtime context, so you can declare connections, assign
+intermediate tables, and print results without rerunning a whole script. After
+each assignment it reports the variable name, row count, column count, and column
+names. Meta-commands:
+
+- `:help` — list available commands
+- `:tables` — list active connections
+- `:vars` — list in-memory variables and their schemas
+- `:quit` — exit the session
+
 ## Run Demos
 
 Each demo contains a `.dqv` source file, input data, expected CSV outputs, and a README.
@@ -148,9 +176,27 @@ uv run python -m daquva demo/demo_04_csv_output/csv_output.dqv
 uv run python -m daquva demo/demo_05_sqlite_output/sqlite_output.dqv
 uv run python -m daquva demo/demo_06_pipeline/pipeline.dqv
 uv run python -m daquva demo/demo_07_multiple_sources/multiple_sources.dqv
+uv run python -m daquva demo/demo_08_functions/functions_pipeline.dqv
+uv run python -m daquva demo/demo_showcase/showcase.dqv
 ```
 
 Generated files go into each demo's `output/` directory. Expected CSV files live in each demo's `expected/` directory.
+
+`demo_showcase` is the end-to-end headline demo: it exercises every major feature
+(scan + typo detection, compound `AND`/`OR` filters, `contains`/`ends_with`,
+`sort`/`limit`, fuzzy duplicates, `merge`, CSV + SQLite output, and the
+`summarize` proof table) over a 30-row dataset. See `demo/demo_showcase/README.md`.
+
+## Live Demo Driver
+
+`present.ps1` (PowerShell, run from `code/`) walks through the whole pipeline with
+a pause before each step — source, lexer tokens, parsed AST, execution, the
+CSV/SQLite proof artifacts, and an optional REPL session. It auto-detects `uv` and
+falls back to plain `python`.
+
+```powershell
+.\present.ps1
+```
 
 ## CSV and SQLite Output
 
@@ -192,6 +238,27 @@ Duplicate detection adds logical metadata columns such as:
 ```dqv
 merged = merge users;
 ```
+
+## Aggregate Proof Summary
+
+`summarize` takes one or more previously bound tables (the stages of a pipeline)
+and produces one row of metrics per stage. Unlike every other command it does not
+add columns to the data; it reduces each stage to a fixed schema of counts, giving
+an inspectable proof that a transformation happened:
+
+```dqv
+proof = summarize raw, paid_adults, dupes, merged;
+proof -> file "output/proof_summary.csv";
+save proof into proof_summary allowDanger;
+```
+
+The result columns are `stage`, `row_count`, `column_count`,
+`duplicate_group_count`, `duplicate_candidate_count`, `typo_suspect_count`,
+`input_rows_represented`, and `rows_removed_by_merge`. The last two are derived
+from the `merged_from_count` annotation, so a merge that collapses several input
+rows into one is reported as rows represented versus rows removed. Because the
+summary is an ordinary result set, it can be written to CSV or SQLite like any
+other table.
 
 ## Example Program
 
